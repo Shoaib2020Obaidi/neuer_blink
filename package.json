@@ -1,0 +1,13 @@
+{
+  "name": "neuer-blick-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neuer Blick Verein e.V. website with Content Studio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}

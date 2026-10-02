@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Neuer Blick | Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <!-- Icon Sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.4 0-10-7-10-7a18.5 18.5 0 0 1 5.1-5.9M9.9 5.2A9.1 9.1 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+      <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+      <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+      <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2M12 20.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1.5 12h2M20.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 6-10 7L2 6"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8M21 3v5h-5"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+      <symbol id="i-drag" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M1 21a8 8 0 0 1 16 0M17 4a4 4 0 0 1 0 8M23 21a8 8 0 0 0-5-7.4"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+      <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+      <symbol id="i-command" viewBox="0 0 24 24"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 0 0 0-6z"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ====================================================================
+       LOGIN STAGE
+       ==================================================================== -->
+  <main class="login-stage" id="loginStage">
+    <div class="login-backdrop" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+      <span class="blob blob-3"></span>
+      <div class="star-pattern"></div>
+      <svg class="rosette" viewBox="0 0 200 200">
+        <g fill="none" stroke="currentColor" stroke-width="0.8">
+          <circle cx="100" cy="100" r="96"/>
+          <circle cx="100" cy="100" r="70"/>
+          <path d="M100 4 128 72 196 100 128 128 100 196 72 128 4 100 72 72z"/>
+          <path d="M100 4 128 72 196 100 128 128 100 196 72 128 4 100 72 72z" transform="rotate(45 100 100)"/>
+          <rect x="50" y="50" width="100" height="100" transform="rotate(22.5 100 100)"/>
+          <rect x="50" y="50" width="100" height="100" transform="rotate(67.5 100 100)"/>
+        </g>
+      </svg>
+      <div class="login-particles" id="loginParticles"></div>
+    </div>
+
+    <section class="login-card" id="loginCard" aria-labelledby="loginTitle">
+      <!-- Left: illustrated welcome -->
+      <div class="login-art">
+        <div class="art-top">
+          <span class="art-badge"><i class="live-dot"></i> Admin Portal</span>
+          <div class="greeting-rotator" aria-live="polite">
+            <span class="greet-word" id="greetWord" lang="fa">سلام</span>
+          </div>
+        </div>
+
+        <figure class="art-figure">
+          <img src="images/kabul-muenster-bridge.jpg" alt="Illustration of Kabul and Münster connected by a bridge" />
+          <span class="art-glow"></span>
+        </figure>
+
+        <div class="art-copy">
+          <h2>One community.<br /><em>Many stories.</em></h2>
+          <p>Shape what visitors see: translations, announcements, events, photos and every message your community sends.</p>
+        </div>
+
+        <div class="art-clocks">
+          <div class="art-clock"><span>🇩🇪 Münster</span><b id="loginClockMunster">--:--</b></div>
+          <span class="art-bridge" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div class="art-clock"><span>🇦🇫 Kabul</span><b id="loginClockKabul">--:--</b></div>
+        </div>
+      </div>
+
+      <!-- Right: sign-in form -->
+      <div class="login-panel">
+        <div class="logo-orbit" aria-hidden="true">
+          <span class="logo-mark">ن</span>
+          <span class="orbit orbit-1"></span>
+          <span class="orbit orbit-2"><i></i></span>
+        </div>
+
+        <p class="eyebrow">Neuer Blick Verein e.V. · Secure access</p>
+        <h1 id="loginTitle"><span id="timeGreeting">Welcome back</span> <span class="wave">👋</span></h1>
+        <p class="login-intro">Sign in to the Content Studio to manage the community website.</p>
+
+        <form id="loginForm" class="login-form" novalidate>
+          <div class="field">
+            <svg class="ico field-icon"><use href="#i-user"/></svg>
+            <input id="username" name="username" autocomplete="username" placeholder=" " required />
+            <label for="username">Username</label>
+            <span class="field-line"></span>
+          </div>
+
+          <div class="field">
+            <svg class="ico field-icon"><use href="#i-lock"/></svg>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder=" " required />
+            <label for="password">Password</label>
+            <button type="button" class="reveal-btn" id="revealPassword" aria-label="Show password" aria-pressed="false">
+              <svg class="ico eye-on"><use href="#i-eye"/></svg>
+              <svg class="ico eye-off"><use href="#i-eye-off"/></svg>
+            </button>
+            <span class="field-line"></span>
+          </div>
+
+          <p class="caps-warning" id="capsWarning" hidden>⇪ Caps Lock is on</p>
+
+          <div class="form-row">
+            <label class="switch">
+              <input type="checkbox" id="rememberMe" />
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+              <span>Keep me signed in</span>
+            </label>
+            <button type="button" class="link-btn" id="forgotBtn">Forgot password?</button>
+          </div>
+
+          <p class="forgot-note" id="forgotNote" hidden>Ask another studio admin to reset your password (Users → Reset). A new password is sent to your email.</p>
+
+          <button class="login-submit" id="loginSubmit" type="submit">
+            <span class="submit-label">Enter Content Studio</span>
+            <span class="submit-icon">
+              <svg class="ico ico-arrow"><use href="#i-arrow"/></svg>
+              <span class="spinner"></span>
+              <svg class="ico ico-check"><use href="#i-check"/></svg>
+            </span>
+          </button>
+
+          <div class="login-error" id="loginError" role="alert" hidden>
+            <span>⚠</span><span id="loginErrorText">Incorrect username or password.</span>
+          </div>
+
+        </form>
+
+        <a class="return-link" href="index.html">
+          <svg class="ico flip"><use href="#i-arrow"/></svg> Back to public website
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====================================================================
+       STUDIO APP
+       ==================================================================== -->
+  <div class="app" id="app" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <span class="side-logo">ن</span>
+        <div>
+          <strong>Content Studio</strong>
+          <small>Neuer Blick e.V.</small>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Studio sections">
+        <p class="side-label">Workspace</p>
+        <button class="nav-item active" data-view="overview"><svg class="ico"><use href="#i-home"/></svg><span>Overview</span></button>
+        <button class="nav-item" data-view="inbox"><svg class="ico"><use href="#i-inbox"/></svg><span>Inbox</span><b class="nav-badge" id="inboxBadge" hidden>0</b></button>
+        <p class="side-label">Website content</p>
+        <button class="nav-item" data-view="translations"><svg class="ico"><use href="#i-globe"/></svg><span>Texts &amp; translations</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="announcements"><svg class="ico"><use href="#i-megaphone"/></svg><span>Announcements</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="event"><svg class="ico"><use href="#i-calendar"/></svg><span>Upcoming event</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="contact"><svg class="ico"><use href="#i-phone"/></svg><span>Contact &amp; social</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="media"><svg class="ico"><use href="#i-image"/></svg><span>Website images</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="gallery"><svg class="ico"><use href="#i-grid"/></svg><span>Photo gallery</span><i class="dirty-dot"></i></button>
+        <p class="side-label">System</p>
+        <button class="nav-item" data-view="users"><svg class="ico"><use href="#i-users"/></svg><span>Users</span></button>
+        <button class="nav-item" data-view="settings"><svg class="ico"><use href="#i-settings"/></svg><span>Settings &amp; backup</span><i class="dirty-dot"></i></button>
+      </nav>
+
+      <div class="side-footer">
+        <div class="storage-meter" title="Signed-in account">
+          <div class="storage-head"><span>Signed in as</span><b id="meName">–</b></div>
+          <div class="storage-head"><span>Last saved</span><b id="lastSaved">–</b></div>
+        </div>
+        <a class="side-action" href="index.html" target="_blank" rel="noopener"><svg class="ico"><use href="#i-external"/></svg><span>View website</span></a>
+        <button class="side-action danger" id="logoutButton" type="button"><svg class="ico"><use href="#i-logout"/></svg><span>Log out</span></button>
+      </div>
+    </aside>
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-only" id="sidebarToggle" type="button" aria-label="Open navigation"><svg class="ico"><use href="#i-menu"/></svg></button>
+        <div class="topbar-title">
+          <p class="crumb">Studio / <span id="crumbName">Overview</span></p>
+          <h1 id="viewTitle">Overview</h1>
+        </div>
+        <button class="search-trigger" id="openPalette" type="button">
+          <svg class="ico"><use href="#i-search"/></svg>
+          <span>Jump to…</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <div class="topbar-clocks">
+          <span title="Münster">🇩🇪 <b id="topClockMunster">--:--</b></span>
+          <span title="Kabul">🇦🇫 <b id="topClockKabul">--:--</b></span>
+        </div>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">
+          <svg class="ico theme-sun"><use href="#i-sun"/></svg>
+          <svg class="ico theme-moon"><use href="#i-moon"/></svg>
+        </button>
+        <div class="avatar" id="avatar" title="Signed in">A</div>
+      </header>
+
+      <div class="views">
+        <!-- OVERVIEW -->
+        <section class="view active" data-view="overview">
+          <div class="welcome-card">
+            <div class="welcome-copy">
+              <p class="eyebrow light" id="welcomeDate">Today</p>
+              <h2><span id="welcomeGreeting">Welcome back</span>, <span id="welcomeName">admin</span>.</h2>
+              <p>Here is what is happening on the Neuer Blick website. Everything you save is stored on the server and goes live for every visitor right away.</p>
+              <div class="welcome-actions">
+                <button class="btn btn-light" data-goto="inbox"><svg class="ico"><use href="#i-inbox"/></svg> Open inbox</button>
+                <a class="btn btn-ghost-light" href="index.html" target="_blank" rel="noopener"><svg class="ico"><use href="#i-external"/></svg> Preview site</a>
+              </div>
+            </div>
+            <div class="welcome-art"><img src="images/kabul-muenster-bridge.jpg" alt="" /></div>
+          </div>
+
+          <div class="kpi-grid">
+            <button class="kpi" data-goto="inbox" style="--accent: var(--saffron)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-inbox"/></svg></span>
+              <span class="kpi-label">New requests</span>
+              <b class="kpi-value" id="kpiNew">0</b>
+              <span class="kpi-sub" id="kpiNewSub">0 total</span>
+            </button>
+            <button class="kpi" data-goto="inbox" data-filter="newsletter" style="--accent: var(--emerald)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-users"/></svg></span>
+              <span class="kpi-label">Newsletter</span>
+              <b class="kpi-value" id="kpiSubs">0</b>
+              <span class="kpi-sub">subscribers</span>
+            </button>
+            <button class="kpi" data-goto="gallery" style="--accent: var(--lapis-light)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-grid"/></svg></span>
+              <span class="kpi-label">Gallery</span>
+              <b class="kpi-value" id="kpiPhotos">0</b>
+              <span class="kpi-sub">photos live</span>
+            </button>
+            <button class="kpi" data-goto="event" style="--accent: var(--pomegranate)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-calendar"/></svg></span>
+              <span class="kpi-label">Next event</span>
+              <b class="kpi-value" id="kpiEvent">–</b>
+              <span class="kpi-sub" id="kpiEventSub">days to go</span>
+            </button>
+          </div>
+
+          <div class="overview-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Recent requests</h3>
+                  <p>Sent from the forms on the website.</p>
+                </div>
+                <button class="btn btn-soft" data-goto="inbox">View all</button>
+              </div>
+              <div id="recentList" class="recent-list"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Requests by type</h3>
+                  <p>All time.</p>
+                </div>
+              </div>
+              <div id="typeBars" class="type-bars"></div>
+              <div class="quick-grid">
+                <button class="quick" data-goto="announcements"><svg class="ico"><use href="#i-megaphone"/></svg>Edit ticker</button>
+                <button class="quick" data-goto="event"><svg class="ico"><use href="#i-calendar"/></svg>Set event date</button>
+                <button class="quick" data-goto="gallery"><svg class="ico"><use href="#i-upload"/></svg>Upload photos</button>
+                <button class="quick" data-goto="translations"><svg class="ico"><use href="#i-globe"/></svg>Edit texts</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- INBOX -->
+        <section class="view" data-view="inbox">
+          <div class="toolbar">
+            <div class="chip-row" id="inboxFilters">
+              <button class="chip active" data-filter="all">All</button>
+              <button class="chip" data-filter="membership">Membership</button>
+              <button class="chip" data-filter="event">Event</button>
+              <button class="chip" data-filter="job">Jobs</button>
+              <button class="chip" data-filter="study">Study</button>
+              <button class="chip" data-filter="volunteer">Volunteer</button>
+              <button class="chip" data-filter="general">General</button>
+              <button class="chip" data-filter="newsletter">Newsletter</button>
+            </div>
+            <div class="toolbar-right">
+              <label class="search-box">
+                <svg class="ico"><use href="#i-search"/></svg>
+                <input id="inboxSearch" type="search" placeholder="Search name, email, message…" />
+              </label>
+              <button class="btn btn-soft" id="markAllRead" type="button"><svg class="ico"><use href="#i-check"/></svg> Mark all read</button>
+              <button class="btn btn-soft" id="exportCsv" type="button"><svg class="ico"><use href="#i-download"/></svg> Export CSV</button>
+            </div>
+          </div>
+          <div id="inboxList" class="inbox-list"></div>
+        </section>
+
+        <!-- TRANSLATIONS -->
+        <section class="view" data-view="translations">
+          <div class="toolbar">
+            <div class="seg" id="langTabs" role="tablist">
+              <button class="seg-btn active" data-lang="fa" role="tab">🇦🇫 فارسی</button>
+              <button class="seg-btn" data-lang="de" role="tab">🇩🇪 Deutsch</button>
+              <button class="seg-btn" data-lang="en" role="tab">🇬🇧 English</button>
+            </div>
+            <div class="toolbar-right">
+              <select id="transGroup" class="select-box" aria-label="Page section"><option value="">All sections</option></select>
+              <label class="search-box">
+                <svg class="ico"><use href="#i-search"/></svg>
+                <input id="transSearch" type="search" placeholder="Search texts or keys…" />
+              </label>
+              <label class="switch small">
+                <input type="checkbox" id="onlyEdited" />
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+                <span>Edited only</span>
+              </label>
+              <button class="btn btn-soft" id="toggleRaw" type="button"><svg class="ico"><use href="#i-code"/></svg> JSON</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div id="transTable" class="trans-table"></div>
+            <div id="rawWrap" class="raw-wrap" hidden>
+              <p class="hint">Advanced: the JSON below holds only your edits (overrides) per language. Remove a key to restore its default text.</p>
+              <textarea id="rawEditor" spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <div class="save-bar">
+            <span class="save-state" id="transState">No unsaved changes</span>
+            <button class="btn btn-primary" id="saveTranslations" type="button"><svg class="ico"><use href="#i-save"/></svg> Save texts</button>
+          </div>
+        </section>
+
+        <!-- ANNOUNCEMENTS -->
+        <section class="view" data-view="announcements">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Ticker messages</h3>
+                <p>Shown in the moving ribbon under the header, in every language. Leave a field empty to use the default translated text.</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label class="input-label">Message 1<input id="messageOne" data-dirty="announcements" placeholder="هر دیدار، یک پل تازه است. به جمع ما خوش آمدید." /></label>
+              <label class="input-label">Message 2<input id="messageTwo" data-dirty="announcements" placeholder="فرهنگ ما، نقطه شروع آینده ماست." /></label>
+              <label class="input-label">Message 3<input id="messageThree" data-dirty="announcements" placeholder="دیدار بعدی: شبی با موسیقی و غذاهای سنتی افغان در مونستر" /></label>
+              <label class="input-label">Message 4<input id="messageFour" data-dirty="announcements" placeholder="همراهی و مشاوره رایگان برای کار و تحصیل در آلمان" /></label>
+            </div>
+            <p class="preview-label">Live preview</p>
+            <div class="ticker-preview"><div class="ticker-track" id="tickerPreview"></div></div>
+          </div>
+          <div class="save-bar">
+            <span class="save-state">Changes go live on save</span>
+            <button class="btn btn-primary" id="saveMessages" type="button"><svg class="ico"><use href="#i-save"/></svg> Save announcements</button>
+          </div>
+        </section>
+
+        <!-- EVENT -->
+        <section class="view" data-view="event">
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Event schedule</h3>
+                  <p>Drives the date badge, the live countdown and the “Add to calendar” file on the website. Times are Münster time.</p>
+                </div>
+              </div>
+              <div class="form-grid">
+                <label class="input-label">Start date &amp; time<input id="eventDate" type="datetime-local" data-dirty="event" /></label>
+                <label class="input-label">Duration (hours)<input id="eventDuration" type="number" min="1" max="72" step="0.5" data-dirty="event" /></label>
+                <label class="input-label full">Location <small>(leave empty to use the contact address)</small><input id="eventLocation" data-dirty="event" /></label>
+              </div>
+              <p class="hint">Event title and description are edited under <button class="inline-link" data-goto="translations" data-search="event">Texts &amp; translations</button> (keys <code>eventTitle</code>, <code>eventText</code>).</p>
+            </div>
+
+            <div class="panel event-preview">
+              <p class="preview-label">Preview</p>
+              <div class="ev-card">
+                <div class="ev-badge"><span id="evMonth">NOV</span><b id="evDay">21</b></div>
+                <div>
+                  <p class="ev-when" id="evWhen">–</p>
+                  <h4>One Table, A Thousand Stories</h4>
+                </div>
+              </div>
+              <div class="ev-countdown" id="evCountdown"></div>
+            </div>
+          </div>
+          <div class="save-bar">
+            <span class="save-state">Visitors see the new date instantly</span>
+            <button class="btn btn-primary" id="saveEvent" type="button"><svg class="ico"><use href="#i-save"/></svg> Save event</button>
+          </div>
+        </section>
+
+        <!-- CONTACT & SOCIAL -->
+        <section class="view" data-view="contact">
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Contact details</h3>
+                  <p>Used in the top bar, the contact section, the map, the WhatsApp and call buttons, the calendar file and the footer.</p>
+                </div>
+              </div>
+              <div class="form-grid">
+                <label class="input-label full">Street &amp; number<input id="cStreet" data-dirty="contact" placeholder="Strinfurter Straße 70" /></label>
+                <label class="input-label">Postcode &amp; city<input id="cCity" data-dirty="contact" placeholder="48149 Münster" /></label>
+                <label class="input-label">Country<input id="cCountry" data-dirty="contact" placeholder="Deutschland" /></label>
+                <label class="input-label">Phone / mobile<input id="cPhone" type="tel" data-dirty="contact" placeholder="+49 251 987 654 30" /></label>
+                <label class="input-label">WhatsApp number <small>(optional, if different)</small><input id="cWhatsapp" type="tel" data-dirty="contact" placeholder="+49 170 1234567" /></label>
+                <label class="input-label full">Email address<input id="cEmail" type="email" data-dirty="contact" placeholder="hallo@neuerblick-verein.de" /></label>
+              </div>
+
+              <div class="panel-head spaced">
+                <div>
+                  <h3>Social media</h3>
+                  <p>Paste the full link to each profile. Leave a field empty to hide that icon on the website.</p>
+                </div>
+              </div>
+              <div class="form-grid">
+                <label class="input-label">Instagram<input id="sInstagram" type="url" data-dirty="contact" placeholder="https://instagram.com/…" /></label>
+                <label class="input-label">Facebook<input id="sFacebook" type="url" data-dirty="contact" placeholder="https://facebook.com/…" /></label>
+                <label class="input-label">YouTube<input id="sYoutube" type="url" data-dirty="contact" placeholder="https://youtube.com/@…" /></label>
+                <label class="input-label">TikTok<input id="sTiktok" type="url" data-dirty="contact" placeholder="https://tiktok.com/@…" /></label>
+              </div>
+            </div>
+
+            <div class="panel">
+              <p class="preview-label">Preview</p>
+              <div class="contact-preview">
+                <div class="cp-row"><span class="cp-icon"><svg class="ico"><use href="#i-home"/></svg></span><div><small>Address</small><p id="pvAddress">–</p></div></div>
+                <div class="cp-row"><span class="cp-icon"><svg class="ico"><use href="#i-phone"/></svg></span><div><small>Phone</small><p id="pvPhone" dir="ltr">–</p></div></div>
+                <div class="cp-row"><span class="cp-icon"><svg class="ico"><use href="#i-mail"/></svg></span><div><small>Email</small><p id="pvEmail">–</p></div></div>
+              </div>
+              <iframe class="map-preview" id="pvMap" title="Map preview" loading="lazy"></iframe>
+            </div>
+          </div>
+          <div class="save-bar">
+            <span class="save-state">Updates every place these details appear</span>
+            <button class="btn btn-primary" id="saveContact" type="button"><svg class="ico"><use href="#i-save"/></svg> Save contact &amp; social</button>
+          </div>
+        </section>
+
+        <!-- WEBSITE IMAGES -->
+        <section class="view" data-view="media">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Website images</h3>
+                <p>Every photo on the website. Uploads are resized, then saved as files in the website's <code>images</code> folder.</p>
+              </div>
+            </div>
+            <div class="slot-grid" id="slotGrid"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Images folder</h3>
+                <p id="libraryInfo">All files in the <code>images</code> folder.</p>
+              </div>
+              <label class="btn btn-soft">
+                <svg class="ico"><use href="#i-upload"/></svg> Upload to folder
+                <input id="libraryUpload" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" multiple hidden />
+              </label>
+            </div>
+            <div class="library-grid" id="libraryGrid"></div>
+          </div>
+
+          <div class="save-bar">
+            <span class="save-state" id="imagesState">No unsaved changes</span>
+            <button class="btn btn-primary" id="saveImages" type="button"><svg class="ico"><use href="#i-save"/></svg> Save images</button>
+          </div>
+        </section>
+
+        <!-- GALLERY -->
+        <section class="view" data-view="gallery">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Photo gallery</h3>
+                <p>Drag cards to reorder. Captions appear in the lightbox in each language.</p>
+              </div>
+              <div class="head-actions">
+                <button class="btn btn-soft" id="addFromLibrary" type="button"><svg class="ico"><use href="#i-grid"/></svg> From images folder</button>
+                <button class="btn btn-soft" id="addImageUrl" type="button"><svg class="ico"><use href="#i-plus"/></svg> Add by URL</button>
+                <button class="btn btn-soft" id="resetGallery" type="button"><svg class="ico"><use href="#i-refresh"/></svg> Defaults</button>
+              </div>
+            </div>
+            <label class="dropzone compact" id="galleryDrop">
+              <input id="galleryImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/avif" multiple />
+              <span class="drop-icon"><svg class="ico"><use href="#i-upload"/></svg></span>
+              <strong>Drop photos here or click to upload several at once</strong>
+              <small>Optimised to 1600px and saved in the images folder</small>
+            </label>
+            <div id="galleryEditor" class="gallery-editor"></div>
+          </div>
+          <div class="save-bar">
+            <span class="save-state" id="galleryState">No unsaved changes</span>
+            <button class="btn btn-primary" id="saveGallery" type="button"><svg class="ico"><use href="#i-save"/></svg> Save gallery</button>
+          </div>
+        </section>
+
+        <!-- USERS -->
+        <section class="view" data-view="users">
+          <div class="mail-banner" id="mailBanner" hidden>
+            <svg class="ico"><use href="#i-mail"/></svg>
+            <span>Email sending is not set up yet, so new credentials are shown to you to pass on. <button class="inline-link" data-goto="settings">Set up email</button></span>
+          </div>
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Studio accounts</h3>
+                  <p>Everyone who can sign in to the Content Studio.</p>
+                </div>
+              </div>
+              <div id="userList" class="user-list"></div>
+            </div>
+
+            <div>
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Add an admin</h3>
+                    <p>The username and password are emailed to the new admin.</p>
+                  </div>
+                </div>
+                <form id="newUserForm" class="form-grid" autocomplete="off">
+                  <label class="input-label">Username<input id="nuUsername" required minlength="3" maxlength="32" pattern="[A-Za-z0-9._\-]+" placeholder="e.g. maryam.k" /></label>
+                  <label class="input-label">Email<input id="nuEmail" type="email" required placeholder="name@example.de" /></label>
+                  <label class="input-label full">Password <small>(leave empty to generate a strong one)</small>
+                    <span class="pw-field">
+                      <input id="nuPassword" type="text" minlength="8" placeholder="Generated automatically" autocomplete="new-password" />
+                      <button type="button" class="btn btn-soft" id="nuGenerate">Generate</button>
+                    </span>
+                  </label>
+                  <label class="switch small full">
+                    <input type="checkbox" id="nuSendEmail" checked />
+                    <span class="switch-track"><span class="switch-thumb"></span></span>
+                    <span>Send the login details by email</span>
+                  </label>
+                  <button class="btn btn-primary full" type="submit" id="nuSubmit"><svg class="ico"><use href="#i-plus"/></svg> Create account</button>
+                </form>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Change my password</h3>
+                    <p>At least 8 characters.</p>
+                  </div>
+                </div>
+                <form id="pwForm" class="form-grid">
+                  <label class="input-label full">Current password<input id="pwCurrent" type="password" required autocomplete="current-password" /></label>
+                  <label class="input-label">New password<input id="pwNext" type="password" required minlength="8" autocomplete="new-password" /></label>
+                  <label class="input-label">Repeat new password<input id="pwRepeat" type="password" required minlength="8" autocomplete="new-password" /></label>
+                  <button class="btn btn-primary full" type="submit"><svg class="ico"><use href="#i-lock"/></svg> Update password</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="view" data-view="settings">
+          <div class="two-col">
+            <div>
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Homepage statistics</h3>
+                    <p>The animated counters in the hero section.</p>
+                  </div>
+                </div>
+                <div class="form-grid three">
+                  <label class="input-label">Years active<input id="statYears" type="number" min="0" data-dirty="settings" /></label>
+                  <label class="input-label">Members &amp; friends<input id="statMembers" type="number" min="0" data-dirty="settings" /></label>
+                  <label class="input-label">Events held<input id="statEvents" type="number" min="0" data-dirty="settings" /></label>
+                </div>
+                <button class="btn btn-primary" id="saveStats" type="button"><svg class="ico"><use href="#i-save"/></svg> Save statistics</button>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>Backup &amp; restore</h3>
+                    <p>Content lives in the website's <code>data</code> folder. A backup file holds all texts, settings, requests and subscribers (images stay in the images folder).</p>
+                  </div>
+                </div>
+                <div class="backup-actions">
+                  <button class="btn btn-soft" id="exportBackup" type="button"><svg class="ico"><use href="#i-download"/></svg> Download backup</button>
+                  <label class="btn btn-soft">
+                    <svg class="ico"><use href="#i-upload"/></svg> Restore from file
+                    <input id="importBackup" type="file" accept="application/json" hidden />
+                  </label>
+                  <button class="btn btn-soft" id="importBrowser" type="button" hidden><svg class="ico"><use href="#i-refresh"/></svg> Import edits saved in this browser (old version)</button>
+                  <button class="btn btn-danger" id="resetAll" type="button"><svg class="ico"><use href="#i-trash"/></svg> Reset all content</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Email sending (SMTP)</h3>
+                  <p>Needed to send login details to new admins. Use the SMTP details of your email provider. For Gmail, create an app password.</p>
+                </div>
+                <span class="status-pill" id="mailStatus">Not set up</span>
+              </div>
+              <form id="mailForm" class="form-grid" autocomplete="off">
+                <label class="input-label full">Provider
+                  <select id="mailPreset">
+                    <option value="">Choose to fill in…</option>
+                    <option value="smtp.gmail.com|465|1">Gmail</option>
+                    <option value="smtp.office365.com|587|0">Outlook / Microsoft 365</option>
+                    <option value="mail.gmx.net|465|1">GMX</option>
+                    <option value="smtp.web.de|587|0">WEB.DE</option>
+                    <option value="smtp.ionos.de|465|1">IONOS</option>
+                    <option value="smtp.strato.de|465|1">STRATO</option>
+                  </select>
+                </label>
+                <label class="input-label">SMTP server<input id="mailHost" placeholder="smtp.gmail.com" /></label>
+                <label class="input-label">Port<input id="mailPort" type="number" placeholder="465" /></label>
+                <label class="input-label">Username / email<input id="mailUser" autocomplete="off" placeholder="verein@gmail.com" /></label>
+                <label class="input-label">Password / app password<input id="mailPass" type="password" autocomplete="new-password" placeholder="••••••••" /></label>
+                <label class="input-label full">Sender shown to recipients<input id="mailFrom" placeholder="Neuer Blick Verein &lt;verein@gmail.com&gt;" /></label>
+                <label class="switch small full">
+                  <input type="checkbox" id="mailSecure" checked />
+                  <span class="switch-track"><span class="switch-thumb"></span></span>
+                  <span>Use SSL/TLS (port 465). Turn off for port 587.</span>
+                </label>
+                <button class="btn btn-primary" type="submit"><svg class="ico"><use href="#i-save"/></svg> Save email settings</button>
+                <button class="btn btn-soft" type="button" id="mailTest"><svg class="ico"><use href="#i-mail"/></svg> Send test email</button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette -->
+  <div class="palette" id="palette" hidden>
+    <div class="palette-backdrop" data-close-palette></div>
+    <div class="palette-box" role="dialog" aria-modal="true" aria-label="Jump to">
+      <label class="palette-search">
+        <svg class="ico"><use href="#i-search"/></svg>
+        <input id="paletteInput" placeholder="Where do you want to go?" autocomplete="off" />
+        <kbd>Esc</kbd>
+      </label>
+      <ul class="palette-list" id="paletteList" role="listbox"></ul>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="confirm" id="confirmDialog" hidden>
+    <div class="palette-backdrop" data-confirm="no"></div>
+    <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <span class="confirm-icon">!</span>
+      <h3 id="confirmTitle">Are you sure?</h3>
+      <p id="confirmText"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-soft" data-confirm="no" type="button">Cancel</button>
+        <button class="btn btn-danger" data-confirm="yes" type="button" id="confirmYes">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Credentials Dialog -->
+  <div class="confirm" id="credDialog" hidden>
+    <div class="palette-backdrop" data-close-cred></div>
+    <div class="confirm-box cred-box" role="dialog" aria-modal="true" aria-labelledby="credTitle">
+      <span class="confirm-icon ok"><svg class="ico"><use href="#i-check"/></svg></span>
+      <h3 id="credTitle">Account created</h3>
+      <p id="credText"></p>
+      <div class="cred-card">
+        <div><small>Username</small><b id="credUser"></b></div>
+        <div><small>Password</small><b id="credPass"></b></div>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn btn-soft" id="credCopy" type="button"><svg class="ico"><use href="#i-copy"/></svg> Copy</button>
+        <a class="btn btn-soft" id="credMail" href="#"><svg class="ico"><use href="#i-mail"/></svg> Open in email app</a>
+        <button class="btn btn-primary" data-close-cred type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Images Folder Picker -->
+  <div class="confirm" id="pickerDialog" hidden>
+    <div class="palette-backdrop" data-close-picker></div>
+    <div class="confirm-box picker-box" role="dialog" aria-modal="true" aria-label="Choose an image">
+      <div class="picker-head">
+        <h3>Choose from the images folder</h3>
+        <button class="mini-btn" data-close-picker type="button" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="picker-grid" id="pickerGrid"></div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script src="site-data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
