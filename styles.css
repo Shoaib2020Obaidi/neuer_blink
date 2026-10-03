@@ -3144,19 +3144,59 @@ body[dir="rtl"] .message-track {
   animation-direction: reverse;
 }
 
-/* Hero callout: parallax layer, ken-burns & word reveal */
+/* Hero callout: parallax layer & the rotating association name */
 .afghanistan-callout {
   background: var(--lapis-deep);
 }
 
 .callout-bg-layer {
   position: absolute;
-  inset: -6%;
-  background: url("images/hero-background.jpg") center/cover no-repeat;
+  inset: 0;
+  overflow: hidden;
   transform: translate3d(0, var(--sy, 0px), 0);
   transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
-  animation: kenBurns 28s ease-in-out infinite alternate;
   will-change: transform;
+}
+
+/* Each slide shows the whole photo (contain); a blurred copy of it fills the spare space.
+   The slide only holds the image URL (set from the studio); its pseudo-elements paint it. */
+.callout-slide {
+  position: absolute;
+  inset: 0;
+  background-size: 0 0;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.callout-slide.active {
+  opacity: 1;
+}
+
+.callout-slide::before,
+.callout-slide::after {
+  content: "";
+  position: absolute;
+  background-image: inherit;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.callout-slide::before {
+  inset: -60px;
+  background-size: cover;
+  filter: blur(28px) brightness(0.7) saturate(1.1);
+}
+
+.callout-slide::after {
+  inset: 0;
+  background-size: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout-slide {
+    transition: none;
+  }
 }
 
 .callout-content h1 {
@@ -3164,23 +3204,74 @@ body[dir="rtl"] .message-track {
   filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.45));
 }
 
-.callout-content h1 .word {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  padding: 0.12em 0.02em 0.1em;
-  margin: -0.12em 0 -0.1em;
+.callout-content h1.name-rotator {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: 14px;
+  overflow-wrap: anywhere;
 }
 
-.callout-content h1 .word > span {
-  display: inline-block;
-  transform: translateY(110%);
-  animation: wordRise 0.9s var(--ease) forwards;
-  animation-delay: calc(0.9s + var(--i) * 0.09s);
+/* Every name lines up with the page edge and sits just above the language chips */
+.name-rotator > span {
+  grid-area: 1 / 1;
+  justify-self: start;
+  align-self: end;
+  text-align: right;
 }
 
-body.loaded .callout-content h1 .word > span {
-  animation-delay: calc(var(--i) * 0.07s);
+body[dir="ltr"] .name-rotator > span {
+  text-align: left;
+}
+
+.name-sizer {
+  visibility: hidden;
+}
+
+.name-rotator > [dir="ltr"] {
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.name-live::after {
+  content: "";
+  display: inline-block;
+  width: 0.07em;
+  height: 0.82em;
+  margin-inline-start: 0.12em;
+  vertical-align: -0.06em;
+  border-radius: 2px;
+  background: #ffd37e;
+  box-shadow: 0 0 14px rgba(255, 211, 126, 0.8);
+  animation: caretBlink 1s steps(1) infinite;
+}
+
+.name-live.typing::after {
+  animation: none;
+}
+
+.name-langs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.name-langs span {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.4s ease, background 0.4s ease, border-color 0.4s ease;
+}
+
+.name-langs span.active {
+  color: #1a1206;
+  background: #ffd37e;
+  border-color: #ffd37e;
 }
 
 .badge-pill {
@@ -3860,8 +3951,7 @@ body.dark .contact-chip.chip-wa:hover {
 /* Keyframes */
 @keyframes blinkColon { 50% { opacity: 0.25; } }
 @keyframes navItemIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-@keyframes kenBurns { from { scale: 1.02; } to { scale: 1.12; } }
-@keyframes wordRise { to { transform: none; } }
+@keyframes caretBlink { 50% { opacity: 0; } }
 @keyframes softPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 225, 160, 0); } 50% { box-shadow: 0 0 0 6px rgba(255, 225, 160, 0.08); } }
 @keyframes riseParticle {
   0% { transform: translate(0, 0); opacity: 0; }
@@ -3984,8 +4074,8 @@ body.dark .contact-chip.chip-wa:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .callout-content h1 .word > span {
-    transform: none;
+  .name-live::after {
+    animation: none;
   }
 
   .footer-art {

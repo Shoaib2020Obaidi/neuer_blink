@@ -134,7 +134,8 @@ img {
   color: #ffd166;
 }
 
-[lang="fa"] {
+[lang="fa"],
+[lang="ps"] {
   font-family: var(--fa);
 }
 
@@ -3395,6 +3396,147 @@ body.dark .lib-meta b {
 }
 
 .lib-actions .mini-btn {
+  background: rgba(10, 25, 20, 0.72);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Hero slideshow: tick box on each folder image */
+.lib-item.is-hero {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 2px var(--saffron);
+}
+
+.lib-hero {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 5px;
+  border-radius: 999px;
+  background: rgba(10, 25, 20, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lib-hero input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lib-hero-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+}
+
+.lib-hero-box .ico {
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+}
+
+.lib-hero-box b {
+  position: absolute;
+  font-size: 11px;
+}
+
+.lib-hero input:checked + .lib-hero-box {
+  background: var(--saffron);
+  border-color: var(--saffron);
+}
+
+.lib-hero input:focus-visible + .lib-hero-box {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.hero-count {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.hero-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-slides {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.hero-slides .hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.hero-slide {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.hero-slide img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+  background: var(--line);
+}
+
+.hero-slide code {
+  display: block;
+  padding: 7px 10px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-num {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--saffron);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hero-slide .mini-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
   background: rgba(10, 25, 20, 0.72);
   color: #fff;
   border-color: transparent;

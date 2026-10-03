@@ -668,7 +668,7 @@ const TYPES = {
   general: { label: 'General', tone: '#64736c' },
   newsletter: { label: 'Newsletter', tone: '#15856e' }
 };
-const LANG_FLAGS = { fa: '🇦🇫 FA', de: '🇩🇪 DE', en: '🇬🇧 EN' };
+const LANG_FLAGS = { fa: '🇦🇫 FA', ps: '🇦🇫 PS', de: '🇩🇪 DE', en: '🇬🇧 EN' };
 
 let submissions = [];
 let subscribers = [];
@@ -706,7 +706,7 @@ const getImages = () => ({ ...DEFAULT_IMAGES, ...(content.images || {}) });
 
 function getGallery() {
   const list = Array.isArray(content.gallery) && content.gallery.length ? content.gallery : defaultGalleryItems;
-  return list.map((item) => ({ url: item.url || '', title: item.title || '', titleDe: item.titleDe || '', titleEn: item.titleEn || '' }));
+  return list.map((item) => ({ url: item.url || '', title: item.title || '', titleDe: item.titleDe || '', titleEn: item.titleEn || '', titlePs: item.titlePs || '' }));
 }
 
 function emptyState(icon, title, text) {
@@ -971,7 +971,7 @@ function buildTransTable() {
   const base = translations[transLang] || {};
   const overrides = workingOverrides[transLang] || {};
   const keys = [...new Set([...Object.keys(base), ...Object.keys(overrides)])];
-  const rtl = transLang === 'fa';
+  const rtl = transLang === 'fa' || transLang === 'ps';
 
   const groups = new Map();
   keys.forEach((key) => {
@@ -1272,7 +1272,7 @@ $('#saveContact')?.addEventListener('click', saveContact);
 // VIEW: Website Images (+ images folder)
 // ==========================================================================
 const IMAGE_SLOTS = [
-  { key: 'calloutBg', label: 'Hero background', where: 'Large photo at the top, behind the main headline', max: 2200 },
+  { key: 'calloutBg', label: 'Hero background', where: 'Large photo at the top, behind the main headline (used when no slideshow photos are ticked)', max: 2200 },
   { key: 'heroMain', label: 'Community photo', where: 'Section under the hero, next to the statistics', max: 1600 },
   { key: 'activity1', label: 'Activity 1 · Culture', where: 'Activities section, first card', max: 1200 },
   { key: 'activity2', label: 'Activity 2 · Education', where: 'Activities section, second card', max: 1200 },
@@ -1283,12 +1283,61 @@ const IMAGE_SLOTS = [
 ];
 let workingImages = {};
 
+const heroList = () => (Array.isArray(workingImages.heroSlides) ? workingImages.heroSlides : []);
+
 function renderImages() {
   workingImages = { ...getImages() };
+  workingImages.heroSlides = [...(Array.isArray(workingImages.heroSlides) ? workingImages.heroSlides : [])];
   paintSlots();
+  paintHeroSlides();
   renderLibrary();
   setDirty('media', false);
 }
+
+// Hero slideshow: the photos ticked in the images folder, in the order they were ticked
+function paintHeroSlides() {
+  const list = heroList();
+  $('#heroCount').textContent = `${list.length} selected`;
+  $('#heroSlides').innerHTML = list.length
+    ? list.map((path, i) => `
+        <div class="hero-slide">
+          <img src="${escapeHtml(path)}" alt="" loading="lazy" />
+          <span class="hero-num">${i + 1}</span>
+          <button class="mini-btn" type="button" data-hero-remove="${escapeHtml(path)}" title="Remove from slideshow" aria-label="Remove from slideshow"><svg class="ico"><use href="#i-x"/></svg></button>
+          <code title="${escapeHtml(path)}">${escapeHtml(path.split('/').pop())}</code>
+        </div>`).join('')
+    : '<p class="hint">No photos ticked yet. The website uses the “Hero background” photo.</p>';
+  syncHeroChecks();
+}
+
+function syncHeroChecks() {
+  const list = heroList();
+  $$('#libraryGrid [data-hero-path]').forEach((input) => {
+    const index = list.indexOf(input.dataset.heroPath);
+    input.checked = index !== -1;
+    const item = input.closest('.lib-item');
+    item.classList.toggle('is-hero', index !== -1);
+    $('.lib-hero b', item).textContent = index === -1 ? '' : String(index + 1);
+  });
+}
+
+function setHeroSlides(list) {
+  workingImages.heroSlides = list;
+  setDirty('media', true);
+  paintHeroSlides();
+}
+
+$('#heroAll')?.addEventListener('click', () => {
+  const paths = $$('#libraryGrid [data-hero-path]').map((input) => input.dataset.heroPath);
+  setHeroSlides([...heroList(), ...paths.filter((p) => !heroList().includes(p))]);
+});
+
+$('#heroNone')?.addEventListener('click', () => setHeroSlides([]));
+
+$('#heroSlides')?.addEventListener('click', (e) => {
+  const remove = e.target.closest('[data-hero-remove]');
+  if (remove) setHeroSlides(heroList().filter((p) => p !== remove.dataset.heroRemove));
+});
 
 function paintSlots() {
   $('#slotGrid').innerHTML = IMAGE_SLOTS.map((slot) => {
@@ -1317,9 +1366,14 @@ async function renderLibrary() {
     const files = await api('images');
     const total = files.reduce((sum, f) => sum + f.size, 0);
     $('#libraryInfo').innerHTML = `${files.length} file${files.length === 1 ? '' : 's'} in the <code>images</code> folder · ${formatSize(total)}`;
-    const live = new Set([...Object.values(getImages()), ...getGallery().map((g) => g.url)]);
+    const live = new Set([...Object.values(getImages()).flat(), ...getGallery().map((g) => g.url)]);
     grid.innerHTML = files.map((f) => `
         <div class="lib-item">
+          <label class="lib-hero" title="Use in the hero slideshow">
+            <input type="checkbox" data-hero-path="${escapeHtml(f.path)}" aria-label="Use ${escapeHtml(f.name)} in the hero slideshow" />
+            <span class="lib-hero-box"><svg class="ico"><use href="#i-check"/></svg><b></b></span>
+            <span class="lib-hero-text">Hero</span>
+          </label>
           <img src="${escapeHtml(f.path)}" alt="" loading="lazy" />
           <div class="lib-meta">
             <span title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
@@ -1330,6 +1384,7 @@ async function renderLibrary() {
             <button class="mini-btn danger" type="button" data-delete-file="${escapeHtml(f.name)}" title="Delete file" aria-label="Delete file"><svg class="ico"><use href="#i-trash"/></svg></button>
           </div>
         </div>`).join('') || emptyState('i-image', 'No images yet', 'Upload images to fill the folder.');
+    syncHeroChecks();
   } catch (e) {
     grid.innerHTML = emptyState('i-image', 'Could not read the folder', escapeHtml(e.message));
   }
@@ -1369,6 +1424,14 @@ $('#slotGrid')?.addEventListener('click', async (e) => {
   paintSlots();
 });
 
+$('#libraryGrid')?.addEventListener('change', (e) => {
+  const input = e.target.closest('[data-hero-path]');
+  if (!input) return;
+  const path = input.dataset.heroPath;
+  const list = heroList();
+  setHeroSlides(input.checked ? [...list, path] : list.filter((p) => p !== path));
+});
+
 $('#libraryGrid')?.addEventListener('click', async (e) => {
   const copy = e.target.closest('[data-copy-path]');
   const del = e.target.closest('[data-delete-file]');
@@ -1381,6 +1444,11 @@ $('#libraryGrid')?.addEventListener('click', async (e) => {
     if (!ok) return;
     try {
       await api(`images/${encodeURIComponent(del.dataset.deleteFile)}`, { method: 'DELETE' });
+      const deletedPath = `images/${del.dataset.deleteFile}`;
+      if (heroList().includes(deletedPath)) {
+        setHeroSlides(heroList().filter((p) => p !== deletedPath));
+        toast('The deleted photo was removed from the hero slideshow. Click “Save images” to publish.');
+      }
       renderLibrary();
       toast('File deleted.');
     } catch (err) {
@@ -1408,7 +1476,11 @@ $('#libraryUpload')?.addEventListener('change', async (e) => {
 async function saveImages() {
   const changed = {};
   Object.entries(workingImages).forEach(([key, value]) => {
-    if (value && value !== DEFAULT_IMAGES[key]) changed[key] = value;
+    if (Array.isArray(value)) {
+      if (value.length) changed[key] = value;
+    } else if (value && value !== DEFAULT_IMAGES[key]) {
+      changed[key] = value;
+    }
   });
   if (await saveContent('images', changed, $('#saveImages'))) {
     setDirty('media', false);
@@ -1453,6 +1525,7 @@ function paintGallery() {
         <div class="g-fields">
           <input class="g-url" data-field="url" value="${escapeHtml(item.url)}" placeholder="images/… or https://…" aria-label="Image path or URL" />
           <label>FA<input data-field="title" dir="rtl" value="${escapeHtml(item.title)}" placeholder="عنوان فارسی" /></label>
+          <label>PS<input data-field="titlePs" dir="rtl" value="${escapeHtml(item.titlePs)}" placeholder="پښتو سرلیک" /></label>
           <label>DE<input data-field="titleDe" value="${escapeHtml(item.titleDe)}" placeholder="Bildunterschrift" /></label>
           <label>EN<input data-field="titleEn" value="${escapeHtml(item.titleEn)}" placeholder="Caption" /></label>
         </div>
@@ -1559,7 +1632,7 @@ async function addGalleryFiles(files) {
   for (const file of images) {
     try {
       const url = await uploadImage(file, 1600);
-      workingGallery.push({ url, title: '', titleDe: '', titleEn: '' });
+      workingGallery.push({ url, title: '', titleDe: '', titleEn: '', titlePs: '' });
       added += 1;
       paintGallery();
     } catch (e) {
@@ -1581,13 +1654,13 @@ $('#galleryImageFile')?.addEventListener('change', (e) => {
 $('#addFromLibrary')?.addEventListener('click', async () => {
   const path = await pickFromLibrary();
   if (!path) return;
-  workingGallery.push({ url: path, title: '', titleDe: '', titleEn: '' });
+  workingGallery.push({ url: path, title: '', titleDe: '', titleEn: '', titlePs: '' });
   paintGallery();
   setDirty('gallery', true);
 });
 
 $('#addImageUrl')?.addEventListener('click', () => {
-  workingGallery.push({ url: '', title: '', titleDe: '', titleEn: '' });
+  workingGallery.push({ url: '', title: '', titleDe: '', titleEn: '', titlePs: '' });
   paintGallery();
   setDirty('gallery', true);
   const inputs = $$('#galleryEditor .g-url');
@@ -1915,7 +1988,7 @@ $('#importBrowser')?.addEventListener('click', async () => {
       const items = [];
       for (const [i, item] of gallery.entries()) {
         const entry = typeof item === 'string' ? { url: item } : item;
-        items.push({ title: '', titleDe: '', titleEn: '', ...entry, url: await toFile(entry.url, `gallery-${i + 1}`) });
+        items.push({ title: '', titleDe: '', titleEn: '', titlePs: '', ...entry, url: await toFile(entry.url, `gallery-${i + 1}`) });
       }
       await saveContent('gallery', items);
     }

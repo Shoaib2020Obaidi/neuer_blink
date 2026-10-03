@@ -237,7 +237,7 @@ async function handleApi(req, res, pathname) {
       email,
       phone: clip(body.phone, 60),
       notes: clip(body.notes, 4000),
-      lang: ['fa', 'de', 'en'].includes(body.lang) ? body.lang : 'fa',
+      lang: ['fa', 'ps', 'de', 'en'].includes(body.lang) ? body.lang : 'fa',
       date: new Date().toISOString(),
       read: false
     };
@@ -253,7 +253,7 @@ async function handleApi(req, res, pathname) {
     if (!/^\S+@\S+\.\S+$/.test(email)) return send(res, 400, { error: 'A valid email is required.' });
     const list = readJson('subscribers.json', []);
     if (!list.some((s) => s.email === email)) {
-      list.unshift({ email, lang: ['fa', 'de', 'en'].includes(body.lang) ? body.lang : 'fa', date: new Date().toISOString() });
+      list.unshift({ email, lang: ['fa', 'ps', 'de', 'en'].includes(body.lang) ? body.lang : 'fa', date: new Date().toISOString() });
       writeJson('subscribers.json', list);
     }
     return send(res, 201, { ok: true });

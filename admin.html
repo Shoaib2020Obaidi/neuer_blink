@@ -334,6 +334,7 @@
           <div class="toolbar">
             <div class="seg" id="langTabs" role="tablist">
               <button class="seg-btn active" data-lang="fa" role="tab">🇦🇫 فارسی</button>
+              <button class="seg-btn" data-lang="ps" role="tab">🇦🇫 پښتو</button>
               <button class="seg-btn" data-lang="de" role="tab">🇩🇪 Deutsch</button>
               <button class="seg-btn" data-lang="en" role="tab">🇬🇧 English</button>
             </div>
@@ -378,7 +379,7 @@
             <div class="form-grid">
               <label class="input-label">Message 1<input id="messageOne" data-dirty="announcements" placeholder="هر دیدار، یک پل تازه است. به جمع ما خوش آمدید." /></label>
               <label class="input-label">Message 2<input id="messageTwo" data-dirty="announcements" placeholder="فرهنگ ما، نقطه شروع آینده ماست." /></label>
-              <label class="input-label">Message 3<input id="messageThree" data-dirty="announcements" placeholder="دیدار بعدی: شبی با موسیقی و غذاهای سنتی افغان در مونستر" /></label>
+              <label class="input-label">Message 3<input id="messageThree" data-dirty="announcements" placeholder="دیدار بعدی: شبی با دوستان و غذاهای سنتی افغان در مونستر" /></label>
               <label class="input-label">Message 4<input id="messageFour" data-dirty="announcements" placeholder="همراهی و مشاوره رایگان برای کار و تحصیل در آلمان" /></label>
             </div>
             <p class="preview-label">Live preview</p>
@@ -485,6 +486,20 @@
               </div>
             </div>
             <div class="slot-grid" id="slotGrid"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Hero slideshow <span class="hero-count" id="heroCount">0 selected</span></h3>
+                <p>Tick any photos in the <b>Images folder</b> below, as many as you like. The top of the website shows them one after another, changing every 10 seconds, in the order shown here. With nothing ticked, the single “Hero background” photo above is used.</p>
+              </div>
+              <div class="hero-tools">
+                <button class="btn btn-soft" id="heroAll" type="button"><svg class="ico"><use href="#i-check"/></svg> Tick all</button>
+                <button class="btn btn-soft" id="heroNone" type="button"><svg class="ico"><use href="#i-x"/></svg> Clear</button>
+              </div>
+            </div>
+            <div class="hero-slides" id="heroSlides"></div>
           </div>
 
           <div class="panel">

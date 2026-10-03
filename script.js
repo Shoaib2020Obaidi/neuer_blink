@@ -1,5 +1,6 @@
 let currentLanguage = 'fa';
-const languageLabels = { fa: '🇦🇫', de: '🇩🇪', en: '🇬🇧' };
+const languageLabels = { fa: '🇦🇫', ps: '🇦🇫', de: '🇩🇪', en: '🇬🇧' };
+const isRtl = (lang = currentLanguage) => lang === 'fa' || lang === 'ps';
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -123,7 +124,8 @@ function applyContactAndMedia() {
     const src = images[img.dataset.img];
     if (src && img.getAttribute('src') !== src) img.src = src;
   });
-  applyCalloutImage(images.calloutBg);
+  const slides = Array.isArray(images.heroSlides) ? images.heroSlides.filter(Boolean) : [];
+  applyHeroSlides(slides.length ? slides : [images.calloutBg]);
 }
 
 function t(key) {
@@ -134,7 +136,7 @@ function renderLanguage() {
   dictionary = buildDictionary();
 
   document.documentElement.lang = currentLanguage;
-  document.body.dir = currentLanguage === 'fa' ? 'rtl' : 'ltr';
+  document.body.dir = isRtl() ? 'rtl' : 'ltr';
 
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     const val = dictionary[element.dataset.i18n];
@@ -159,24 +161,129 @@ function renderLanguage() {
 
   applyContactAndMedia();
   prepareMarquee();
-  animateHeadline();
+  startNameRotator();
   renderEventDetails();
   if (galleryReady) renderGallery(true);
 }
 
-function applyCalloutImage(image) {
-  if (!image) return;
-  const layer = document.getElementById('calloutBgLayer');
-  if (layer) layer.style.backgroundImage = `url("${image.replace(/"/g, '%22')}")`;
+// Hero background: one photo, or any number chosen in the studio that cross-fade every 10 seconds
+const HERO_SLIDE_INTERVAL = 10000;
+let heroSlideKey = '';
+let heroSlideTimer = null;
+
+// Photos load only when they are about to be shown, so a long slideshow stays light
+function loadSlide(slide) {
+  if (slide && !slide.style.backgroundImage) slide.style.backgroundImage = `url("${slide.dataset.src.replace(/"/g, '%22')}")`;
 }
 
-function animateHeadline() {
+function applyHeroSlides(list) {
+  const layer = document.getElementById('calloutBgLayer');
+  const images = list.filter(Boolean);
+  const key = images.join('|');
+  if (!layer || !images.length || key === heroSlideKey) return;
+  heroSlideKey = key;
+  clearInterval(heroSlideTimer);
+
+  layer.innerHTML = images
+    .map((src, i) => `<div class="callout-slide${i === 0 ? ' active' : ''}" data-src="${escapeHtml(src)}"></div>`)
+    .join('');
+  const slides = layer.querySelectorAll('.callout-slide');
+  loadSlide(slides[0]);
+  if (slides.length < 2) return;
+  loadSlide(slides[1]);
+
+  let current = 0;
+  heroSlideTimer = setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+    loadSlide(slides[(current + 1) % slides.length]);
+  }, HERO_SLIDE_INTERVAL);
+}
+
+// Hero headline: the association's name, written out in every language in turn
+const NAME_LANGS = ['fa', 'ps', 'de', 'en'];
+const NAME_INTERVAL = 4000;
+let nameTimer = null;
+let nameRun = 0;
+
+function nameFor(lang) {
+  const overrides = siteContent.overrides || {};
+  return stripTags(overrides[lang]?.brandName || translations[lang]?.brandName || '');
+}
+
+// Erase the current name, then type the next one character by character
+function writeName(el, text, onDone) {
+  const run = ++nameRun;
+  const from = [...el.textContent];
+  const to = [...text];
+  const eraseStep = Math.min(28, 320 / Math.max(1, from.length));
+  const typeStep = Math.min(75, 1100 / Math.max(1, to.length));
+  el.classList.add('typing');
+
+  const type = (i) => {
+    if (run !== nameRun) return;
+    el.textContent = to.slice(0, i).join('');
+    if (i < to.length) setTimeout(() => type(i + 1), typeStep);
+    else {
+      el.classList.remove('typing');
+      if (onDone) onDone();
+    }
+  };
+  const erase = (i) => {
+    if (run !== nameRun) return;
+    el.textContent = from.slice(0, i).join('');
+    if (i > 0) setTimeout(() => erase(i - 1), eraseStep);
+    else {
+      el.lang = el.dataset.nextLang;
+      el.dir = isRtl(el.dataset.nextLang) ? 'rtl' : 'ltr';
+      type(1);
+    }
+  };
+  erase(from.length);
+}
+
+function startNameRotator() {
   const heading = document.getElementById('afghanistan-title');
   if (!heading) return;
-  const words = heading.textContent.trim().split(/\s+/);
-  heading.innerHTML = words
-    .map((word, i) => `<span class="word" style="--i:${i}"><span>${escapeHtml(word)}</span></span>`)
-    .join(' ');
+  clearTimeout(nameTimer);
+  nameRun += 1;
+
+  const order = [currentLanguage, ...NAME_LANGS.filter((lang) => lang !== currentLanguage)];
+  const dirOf = (lang) => (isRtl(lang) ? 'rtl' : 'ltr');
+  // Invisible copies of every name keep the heading height steady while it changes
+  heading.innerHTML = order
+    .map((lang) => `<span class="name-sizer" aria-hidden="true" lang="${lang}" dir="${dirOf(lang)}">${escapeHtml(nameFor(lang))}</span>`)
+    .join('') + `<span class="name-live" aria-hidden="true" lang="${currentLanguage}" dir="${dirOf(currentLanguage)}"></span>`;
+  heading.setAttribute('aria-label', nameFor(currentLanguage));
+
+  let dots = document.getElementById('nameLangs');
+  if (!dots) {
+    dots = document.createElement('div');
+    dots.id = 'nameLangs';
+    dots.className = 'name-langs';
+    dots.setAttribute('aria-hidden', 'true');
+    heading.after(dots);
+  }
+  dots.innerHTML = order.map((lang) => `<span data-lang="${lang}">${lang.toUpperCase()}</span>`).join('');
+
+  const live = heading.querySelector('.name-live');
+  let index = 0;
+  const showNext = () => {
+    const lang = order[index % order.length];
+    index += 1;
+    dots.querySelectorAll('span').forEach((dot) => dot.classList.toggle('active', dot.dataset.lang === lang));
+    live.dataset.nextLang = lang;
+    if (prefersReducedMotion) {
+      live.lang = lang;
+      live.dir = dirOf(lang);
+      live.textContent = nameFor(lang);
+    } else {
+      writeName(live, nameFor(lang));
+    }
+    nameTimer = setTimeout(showNext, NAME_INTERVAL);
+  };
+  showNext();
 }
 
 // Live updates when the studio saves in another tab of this browser
@@ -523,7 +630,7 @@ function renderEventDetails() {
     return;
   }
 
-  const locale = { fa: 'fa-AF-u-ca-gregory', de: 'de-DE', en: 'en-GB' }[currentLanguage] || 'en-GB';
+  const locale = { fa: 'fa-AF-u-ca-gregory', ps: 'ps-AF-u-ca-gregory', de: 'de-DE', en: 'en-GB' }[currentLanguage] || 'en-GB';
   try {
     const formatted = new Intl.DateTimeFormat(locale, {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -681,7 +788,8 @@ function getSavedGallery() {
         url: item,
         title: `تصویر گالری نگاه نو ${idx + 1}`,
         titleDe: `Galeriebild Neuer Blick ${idx + 1}`,
-        titleEn: `Neuer Blick Gallery Image ${idx + 1}`
+        titleEn: `Neuer Blick Gallery Image ${idx + 1}`,
+        titlePs: `د نوي نظر ګالري انځور ${idx + 1}`
       };
     }
     return item;
@@ -691,6 +799,7 @@ function getSavedGallery() {
 function captionFor(item) {
   if (currentLanguage === 'de') return item.titleDe || item.title || '';
   if (currentLanguage === 'en') return item.titleEn || item.title || '';
+  if (currentLanguage === 'ps') return item.titlePs || item.title || '';
   return item.title || '';
 }
 
@@ -794,15 +903,15 @@ lightboxModal?.addEventListener('touchend', (e) => {
   const dx = e.changedTouches[0].clientX - touchStartX;
   touchStartX = null;
   if (Math.abs(dx) < 40) return;
-  const forward = currentLanguage === 'fa' ? dx > 0 : dx < 0;
+  const forward = isRtl() ? dx > 0 : dx < 0;
   forward ? nextLightboxImage() : prevLightboxImage();
 });
 
 document.addEventListener('keydown', (e) => {
   if (!lightboxModal?.classList.contains('active')) return;
   if (e.key === 'Escape') closeLightbox();
-  else if (e.key === 'ArrowRight') currentLanguage === 'fa' ? prevLightboxImage() : nextLightboxImage();
-  else if (e.key === 'ArrowLeft') currentLanguage === 'fa' ? nextLightboxImage() : prevLightboxImage();
+  else if (e.key === 'ArrowRight') isRtl() ? prevLightboxImage() : nextLightboxImage();
+  else if (e.key === 'ArrowLeft') isRtl() ? nextLightboxImage() : prevLightboxImage();
 });
 
 document.getElementById('galleryPrev')?.addEventListener('click', () => { galleryPage -= 1; renderGallery(); });
