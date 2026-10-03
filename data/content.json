@@ -1,0 +1,62 @@
+{
+  "messages": {
+    "three": "دیدار بعدی: شبی با دوستان و غذاهای سنتی افغان در مونستر"
+  },
+  "updatedAt": "2026-10-02T23:38:45.949Z",
+  "updatedBy": "adminobaidi",
+  "contact": {
+    "addressStreet": "Strinfurter Straße 70",
+    "addressCity": "48149 Münster",
+    "addressCountry": "Deutschland",
+    "phone": "+49 000000 00000",
+    "whatsapp": "",
+    "email": "neuerblick2026@gmail.com"
+  },
+  "social": {
+    "instagram": "https://instagram.com",
+    "facebook": "https://facebook.com",
+    "youtube": "https://youtube.com",
+    "tiktok": "https://tiktok.com"
+  },
+  "gallery": [
+    {
+      "url": "images/activity-family.jpg",
+      "title": "سنت مهمان‌نوازی افغان و نوشیدن چای با زعفران و هل",
+      "titleDe": "Traditionelle Tee-Zeremonie mit Safran & Kardamom",
+      "titleEn": "Traditional Afghan Tea Ceremony with Saffron & Cardamom"
+    },
+    {
+      "url": "images/activity-culture.jpg",
+      "title": "هنر دست‌باف قالی و گلیم اصیل افغان با نقوش سنتی",
+      "titleDe": "Handgewebte traditionelle afghanische Teppichkunst",
+      "titleEn": "Handwoven Traditional Afghan Carpets & Kilims"
+    },
+    {
+      "url": "images/event-dinner.jpg",
+      "title": "ضیافت شام فرهنگی \"یک میز، هزار داستان\" با غذاهای سنتی",
+      "titleDe": "Kulturelles Festessen mit traditioneller Küche in Münster",
+      "titleEn": "Community Cultural Feast & Afghan Cuisine in Münster"
+    },
+    {
+      "url": "images/activity-education.jpg",
+      "title": "کارگاه‌های آموزشی، کتاب‌خوانی و توانمندسازی جوانان",
+      "titleDe": "Bildungs-Workshops, Tandems & Jugendförderung",
+      "titleEn": "Educational Workshops & Youth Empowerment"
+    },
+    {
+      "url": "images/activity-dialogue.jpg",
+      "title": "پیوند همبستگی، مهربانی و امید در میان خانواده‌ها و جامعه",
+      "titleDe": "Zusammenhalt, Vielfalt & gegenseitige Unterstützung",
+      "titleEn": "Solidarity, Inclusion & Mutual Community Support"
+    },
+    {
+      "url": "images/kb2-murlt12j.jpg",
+      "title": "",
+      "titleDe": "",
+      "titleEn": ""
+    }
+  ],
+  "images": {
+    "calloutBg": "images/kb2-murlsftm.jpg"
+  }
+}

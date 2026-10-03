@@ -1,0 +1,20 @@
+[
+  {
+    "username": "adminobaidi",
+    "email": "",
+    "salt": "4137b57e3d73bff7e672bb68a1707dc2",
+    "hash": "091de265e6548a3ebf7731a6835d09857b93bfd944a5bd68834628b597f541c9eed8ba9065d8618552e425a76fdc2b5bce507584796cdb78ef70865f25081fba",
+    "createdAt": "2026-10-02T23:35:29.258Z",
+    "createdBy": "system",
+    "lastLogin": "2026-10-02T23:39:48.875Z"
+  },
+  {
+    "username": "adminmomin",
+    "email": "neuerblick2026@gmail.com",
+    "salt": "daa415bf72fb712ac5743bd5eba5fcc6",
+    "hash": "aa397fd8256e2f48974ca0ac2bf03252ed8f460dd913dae581aa92a614d55fdabca0188c3014e29868cb41013a8c1df2a0a9387e4e217788e01bb538ca3b4375",
+    "createdAt": "2026-10-02T23:43:16.313Z",
+    "createdBy": "adminobaidi",
+    "lastLogin": "2026-10-02T23:43:24.926Z"
+  }
+]
