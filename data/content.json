@@ -2,7 +2,7 @@
   "messages": {
     "three": "دیدار بعدی: شبی با دوستان و غذاهای سنتی افغان در مونستر"
   },
-  "updatedAt": "2026-10-02T23:38:45.949Z",
+  "updatedAt": "2026-10-03T11:06:57.563Z",
   "updatedBy": "adminobaidi",
   "contact": {
     "addressStreet": "Strinfurter Straße 70",
@@ -23,40 +23,51 @@
       "url": "images/activity-family.jpg",
       "title": "سنت مهمان‌نوازی افغان و نوشیدن چای با زعفران و هل",
       "titleDe": "Traditionelle Tee-Zeremonie mit Safran & Kardamom",
-      "titleEn": "Traditional Afghan Tea Ceremony with Saffron & Cardamom"
+      "titleEn": "Traditional Afghan Tea Ceremony with Saffron & Cardamom",
+      "titlePs": ""
     },
     {
       "url": "images/activity-culture.jpg",
       "title": "هنر دست‌باف قالی و گلیم اصیل افغان با نقوش سنتی",
       "titleDe": "Handgewebte traditionelle afghanische Teppichkunst",
-      "titleEn": "Handwoven Traditional Afghan Carpets & Kilims"
+      "titleEn": "Handwoven Traditional Afghan Carpets & Kilims",
+      "titlePs": ""
     },
     {
       "url": "images/event-dinner.jpg",
       "title": "ضیافت شام فرهنگی \"یک میز، هزار داستان\" با غذاهای سنتی",
       "titleDe": "Kulturelles Festessen mit traditioneller Küche in Münster",
-      "titleEn": "Community Cultural Feast & Afghan Cuisine in Münster"
+      "titleEn": "Community Cultural Feast & Afghan Cuisine in Münster",
+      "titlePs": ""
     },
     {
       "url": "images/activity-education.jpg",
       "title": "کارگاه‌های آموزشی، کتاب‌خوانی و توانمندسازی جوانان",
       "titleDe": "Bildungs-Workshops, Tandems & Jugendförderung",
-      "titleEn": "Educational Workshops & Youth Empowerment"
+      "titleEn": "Educational Workshops & Youth Empowerment",
+      "titlePs": ""
     },
     {
       "url": "images/activity-dialogue.jpg",
       "title": "پیوند همبستگی، مهربانی و امید در میان خانواده‌ها و جامعه",
       "titleDe": "Zusammenhalt, Vielfalt & gegenseitige Unterstützung",
-      "titleEn": "Solidarity, Inclusion & Mutual Community Support"
+      "titleEn": "Solidarity, Inclusion & Mutual Community Support",
+      "titlePs": ""
     },
     {
       "url": "images/kb2-murlt12j.jpg",
       "title": "",
       "titleDe": "",
-      "titleEn": ""
+      "titleEn": "",
+      "titlePs": ""
     }
   ],
   "images": {
-    "calloutBg": "images/kb2-murlsftm.jpg"
+    "heroSlides": [
+      "images/4-musa5sfh.jpg",
+      "images/3-musa5sej.jpg",
+      "images/2-musa5sde.jpg",
+      "images/5.jpg"
+    ]
   }
 }
