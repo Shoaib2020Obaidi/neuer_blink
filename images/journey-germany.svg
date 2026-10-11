@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- Münster at golden hour: St. Paulus Dom, the Lamberti spire, the Prinzipalmarkt gables and bicycles -->
+  <defs>
+    <linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a6a9a"/>
+      <stop offset="0.5" stop-color="#8fb6d6"/>
+      <stop offset="0.8" stop-color="#f3c98f"/>
+      <stop offset="1" stop-color="#f7dcae"/>
+    </linearGradient>
+    <radialGradient id="gsun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff4d6"/>
+      <stop offset="1" stop-color="#ffd37e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="copper" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3f8a76"/>
+      <stop offset="0.5" stop-color="#6cbba2"/>
+      <stop offset="1" stop-color="#357766"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9c3a2"/>
+      <stop offset="1" stop-color="#a98a63"/>
+    </linearGradient>
+    <linearGradient id="street" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8a587"/>
+      <stop offset="1" stop-color="#7d6a52"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#gsky)"/>
+  <circle cx="300" cy="520" r="240" fill="url(#gsun)" opacity="0.9"/>
+  <g fill="#fff" opacity="0.55">
+    <ellipse cx="420" cy="170" rx="120" ry="26"/><ellipse cx="500" cy="160" rx="80" ry="30"/>
+    <ellipse cx="1250" cy="120" rx="140" ry="24"/><ellipse cx="1180" cy="112" rx="70" ry="26"/>
+  </g>
+
+  <!-- Far city and trees -->
+  <path d="M0 600 Q120 570 240 590 T480 585 T720 590 T960 580 T1200 592 T1440 582 T1600 590 V700 H0 Z" fill="#6f8d6a" opacity="0.8"/>
+
+  <!-- St. Paulus Dom: two towers with copper roofs -->
+  <g>
+    <rect x="560" y="400" width="300" height="250" fill="url(#stone)"/>
+    <rect x="580" y="330" width="90" height="320" fill="url(#stone)"/>
+    <rect x="750" y="330" width="90" height="320" fill="url(#stone)"/>
+    <path d="M572 334 L625 250 L678 334 Z" fill="url(#copper)"/>
+    <path d="M742 334 L795 250 L848 334 Z" fill="url(#copper)"/>
+    <path d="M600 410 L710 350 L820 410 Z" fill="url(#copper)"/>
+    <g fill="#5b4632">
+      <path d="M605 380 h20 v40 h-20z M645 380 h20 v40 h-20z M775 380 h20 v40 h-20z M815 380 h20 v40 h-20z"/>
+      <path d="M690 470 Q710 440 730 470 V560 H690 Z"/>
+      <circle cx="710" cy="430" r="16"/>
+    </g>
+    <path d="M625 250 v-18 M795 250 v-18" stroke="#4a3a2a" stroke-width="3"/>
+  </g>
+
+  <!-- St. Lamberti with its openwork spire -->
+  <g>
+    <rect x="1080" y="330" width="80" height="320" fill="url(#stone)"/>
+    <path d="M1074 334 L1120 120 L1166 334 Z" fill="#cdb38f"/>
+    <g stroke="#8a6b48" stroke-width="2.5" fill="none">
+      <path d="M1088 300 L1120 150 L1152 300"/>
+      <path d="M1094 270 h52 M1100 240 h40 M1106 210 h28 M1111 180 h18"/>
+    </g>
+    <path d="M1120 120 v-24" stroke="#4a3a2a" stroke-width="3"/>
+    <g fill="#e2c46a">
+      <rect x="1096" y="380" width="14" height="24" rx="3"/><rect x="1118" y="380" width="14" height="24" rx="3"/><rect x="1140" y="380" width="14" height="24" rx="3"/>
+    </g>
+  </g>
+
+  <!-- Prinzipalmarkt: gabled houses with arcades -->
+  <g>
+    <path d="M0 640 V520 L60 450 L120 520 V640 Z" fill="#e7d3b1"/>
+    <path d="M120 640 V500 L190 420 L260 500 V640 Z" fill="#d9bb8d"/>
+    <path d="M260 640 V530 L320 460 L380 530 V640 Z" fill="#ecdcc0"/>
+    <path d="M380 640 V510 L445 430 L510 510 V640 Z" fill="#cfae7e"/>
+    <path d="M900 640 V520 L960 450 L1020 520 V640 Z" fill="#e2c9a0"/>
+    <path d="M1190 640 V500 L1260 420 L1330 500 V640 Z" fill="#d4b483"/>
+    <path d="M1330 640 V530 L1390 460 L1450 530 V640 Z" fill="#ead8b8"/>
+    <path d="M1450 640 V510 L1525 430 L1600 510 V640 Z" fill="#cfae7e"/>
+    <!-- Stepped gable details and windows -->
+    <g fill="#7a5c3c" opacity="0.85">
+      <path d="M30 540 h20 v28 h-20z M70 540 h20 v28 h-20z M150 520 h22 v30 h-22z M208 520 h22 v30 h-22z M290 550 h18 v26 h-18z M332 550 h18 v26 h-18z"/>
+      <path d="M410 530 h22 v30 h-22z M458 530 h22 v30 h-22z M930 540 h20 v28 h-20z M970 540 h20 v28 h-20z"/>
+      <path d="M1220 520 h22 v30 h-22z M1278 520 h22 v30 h-22z M1360 550 h18 v26 h-18z M1402 550 h18 v26 h-18z M1480 530 h22 v30 h-22z M1528 530 h22 v30 h-22z"/>
+    </g>
+    <!-- Arcades -->
+    <g fill="#5b4632">
+      <path d="M10 640 V600 Q30 580 50 600 V640 Z M70 640 V600 Q90 580 110 600 V640 Z"/>
+      <path d="M135 640 V600 Q160 578 185 600 V640 Z M200 640 V600 Q225 578 250 600 V640 Z"/>
+      <path d="M270 640 V605 Q295 585 320 605 V640 Z M330 640 V605 Q352 587 374 605 V640 Z"/>
+      <path d="M395 640 V600 Q420 578 445 600 V640 Z M455 640 V600 Q480 578 505 600 V640 Z"/>
+      <path d="M910 640 V600 Q935 580 960 600 V640 Z M965 640 V600 Q990 580 1015 600 V640 Z"/>
+      <path d="M1200 640 V600 Q1225 578 1250 600 V640 Z M1265 640 V600 Q1290 578 1315 600 V640 Z"/>
+      <path d="M1340 640 V605 Q1365 585 1390 605 V640 Z M1400 640 V605 Q1422 587 1444 605 V640 Z"/>
+      <path d="M1465 640 V600 Q1490 578 1515 600 V640 Z M1530 640 V600 Q1555 578 1580 600 V640 Z"/>
+    </g>
+  </g>
+
+  <!-- Cobblestone square -->
+  <path d="M0 640 H1600 V900 H0 Z" fill="url(#street)"/>
+  <g stroke="#6d5b45" stroke-width="2" opacity="0.35" fill="none">
+    <path d="M0 690 Q800 670 1600 690 M0 750 Q800 725 1600 750 M0 820 Q800 790 1600 820"/>
+  </g>
+
+  <!-- Bicycles, the city's signature -->
+  <g stroke="#1f2a33" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(300 760)">
+      <circle cx="0" cy="0" r="34"/><circle cx="110" cy="0" r="34"/>
+      <path d="M0 0 L40 -50 H90 L110 0 M40 -50 L60 0 H0 M90 -50 L82 -70 H100 M40 -50 L32 -66 H52"/>
+    </g>
+    <g transform="translate(1180 790) scale(0.85)">
+      <circle cx="0" cy="0" r="34"/><circle cx="110" cy="0" r="34"/>
+      <path d="M0 0 L40 -50 H90 L110 0 M40 -50 L60 0 H0 M90 -50 L82 -70 H100 M40 -50 L32 -66 H52"/>
+    </g>
+  </g>
+
+  <!-- Linden trees -->
+  <g fill="#4f7a3c">
+    <circle cx="560" cy="600" r="48"/><circle cx="600" cy="585" r="40"/><rect x="574" y="610" width="10" height="40" fill="#5b4632"/>
+    <circle cx="1030" cy="604" r="44"/><circle cx="1062" cy="590" r="34"/><rect x="1040" y="612" width="10" height="38" fill="#5b4632"/>
+  </g>
+</svg>

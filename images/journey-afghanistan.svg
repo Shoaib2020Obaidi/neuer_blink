@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- Afghanistan at dawn: Hindu Kush, the Minaret of Jam, the Bamiyan cliffs and the lakes of Band-e Amir -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b2740"/>
+      <stop offset="0.45" stop-color="#2d5f86"/>
+      <stop offset="0.75" stop-color="#e9a05a"/>
+      <stop offset="1" stop-color="#f6c98a"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff2c9"/>
+      <stop offset="0.35" stop-color="#ffd37e" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffd37e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3fc1d0"/>
+      <stop offset="1" stop-color="#0e6d8a"/>
+    </linearGradient>
+    <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c79a6b"/>
+      <stop offset="1" stop-color="#8a5f3c"/>
+    </linearGradient>
+    <linearGradient id="minaret" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f5e34"/>
+      <stop offset="0.5" stop-color="#c88c55"/>
+      <stop offset="1" stop-color="#7a4e2b"/>
+    </linearGradient>
+    <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6c98a" stop-opacity="0"/>
+      <stop offset="1" stop-color="#f6c98a" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="1060" cy="300" r="260" fill="url(#sun)"/>
+  <circle cx="1060" cy="300" r="62" fill="#fff0c4" opacity="0.95"/>
+
+  <!-- Stars fading into dawn -->
+  <g fill="#fff" opacity="0.7">
+    <circle cx="120" cy="80" r="1.6"/><circle cx="300" cy="140" r="1.2"/><circle cx="520" cy="60" r="1.8"/>
+    <circle cx="760" cy="110" r="1.1"/><circle cx="1320" cy="70" r="1.6"/><circle cx="1480" cy="160" r="1.2"/>
+    <circle cx="980" cy="40" r="1.3"/><circle cx="220" cy="220" r="1"/>
+  </g>
+
+  <!-- Far snowy ranges of the Hindu Kush -->
+  <path d="M0 520 L120 420 L210 470 L330 360 L430 440 L560 330 L690 430 L800 380 L930 450 L1060 350 L1180 430 L1300 370 L1430 450 L1600 380 V900 H0 Z" fill="#4e6f8f" opacity="0.75"/>
+  <path d="M330 360 L360 388 L345 386 L330 400 L315 386 L300 392 Z M560 330 L595 365 L577 362 L560 378 L543 362 L525 368 Z M1060 350 L1092 380 L1076 377 L1060 392 L1044 377 L1028 382 Z M1300 370 L1328 396 L1314 394 L1300 406 L1286 394 L1272 398 Z" fill="#eef4f8" opacity="0.9"/>
+  <path d="M0 600 L150 500 L260 560 L400 470 L520 540 L660 480 L780 560 L900 500 L1030 570 L1150 490 L1290 560 L1420 500 L1600 560 V900 H0 Z" fill="#35536f"/>
+  <rect y="480" width="1600" height="160" fill="url(#haze)"/>
+
+  <!-- Bamiyan cliffs with the niches of the Buddhas -->
+  <path d="M1080 660 L1110 560 L1180 540 L1290 545 L1420 530 L1520 548 L1600 540 V760 H1080 Z" fill="url(#cliff)"/>
+  <path d="M1110 560 L1180 540 L1290 545 L1420 530 L1520 548 L1600 540 V560 L1520 566 L1420 550 L1290 565 L1180 560 Z" fill="#e2b98a" opacity="0.6"/>
+  <path d="M1200 735 V640 Q1200 600 1225 600 Q1250 600 1250 640 V735 Z" fill="#5d3b22"/>
+  <path d="M1400 735 V610 Q1400 560 1432 560 Q1464 560 1464 610 V735 Z" fill="#5d3b22"/>
+  <g fill="#6f4a2d">
+    <rect x="1290" y="650" width="16" height="22" rx="7"/><rect x="1320" y="640" width="16" height="22" rx="7"/>
+    <rect x="1350" y="660" width="16" height="22" rx="7"/><rect x="1500" y="640" width="16" height="22" rx="7"/>
+    <rect x="1140" y="660" width="14" height="20" rx="6"/>
+  </g>
+
+  <!-- Minaret of Jam -->
+  <g>
+    <path d="M410 760 L418 420 L462 420 L470 760 Z" fill="url(#minaret)"/>
+    <path d="M422 420 L426 300 L454 300 L458 420 Z" fill="url(#minaret)"/>
+    <path d="M430 300 L432 230 L448 230 L450 300 Z" fill="url(#minaret)"/>
+    <ellipse cx="440" cy="224" rx="12" ry="8" fill="#8f5e34"/>
+    <rect x="414" y="414" width="52" height="10" rx="3" fill="#6b4425"/>
+    <rect x="420" y="296" width="40" height="8" rx="3" fill="#6b4425"/>
+    <g stroke="#3fa7b5" stroke-width="3" opacity="0.85">
+      <path d="M416 470 H464 M415 520 H465 M414 600 H466 M413 680 H467"/>
+      <path d="M426 340 H454 M425 380 H455"/>
+    </g>
+    <g fill="#e0b27c" opacity="0.6">
+      <path d="M420 480 h40 v8 h-40z M419 540 h42 v6 h-42z M418 620 h44 v6 h-44z"/>
+    </g>
+  </g>
+
+  <!-- Band-e Amir lakes -->
+  <path d="M0 760 Q200 700 420 730 Q640 760 860 720 Q1080 690 1300 740 Q1460 770 1600 730 V900 H0 Z" fill="#e8dcc0"/>
+  <path d="M30 790 Q240 735 440 760 Q650 790 870 752 Q1080 722 1290 770 Q1450 800 1580 770 Q1500 860 1200 870 Q800 885 400 870 Q120 860 30 790 Z" fill="url(#lake)"/>
+  <path d="M120 800 Q300 770 460 785 M600 790 Q760 770 900 775 M1100 780 Q1240 770 1380 790" stroke="#bff3f7" stroke-width="3" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M0 860 Q400 900 800 880 Q1200 860 1600 890 V900 H0 Z" fill="#c9b48e"/>
+
+  <!-- Poplars by the water -->
+  <g fill="#3d5a2a">
+    <path d="M640 760 Q630 700 646 650 Q662 700 652 760 Z"/>
+    <path d="M672 762 Q664 712 678 672 Q692 712 684 762 Z"/>
+    <path d="M940 740 Q930 680 946 630 Q962 680 952 740 Z"/>
+  </g>
+</svg>
