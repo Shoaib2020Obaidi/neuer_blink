@@ -25,13 +25,20 @@ const DATA_DIR = path.join(ROOT, 'data');
 const IMAGES_DIR = path.join(ROOT, 'images');
 const PORT = Number(process.env.PORT) || 3000;
 
-const DEFAULT_ADMIN = { username: 'adminobaidi', password: 'adminobaidi' };
+// First admin account, created only when data/users.json does not exist yet.
+// On a public server set ADMIN_USERNAME / ADMIN_PASSWORD so the built-in password is never used.
+const DEFAULT_ADMIN = {
+  username: (process.env.ADMIN_USERNAME || 'adminobaidi').toLowerCase(),
+  password: process.env.ADMIN_PASSWORD || 'adminobaidi'
+};
 const SESSION_HOURS = 12;
 const REMEMBER_DAYS = 30;
 const MAX_LOGIN_FAILS = 5;
 const LOCK_MS = 30 * 1000;
 const MAX_BODY = 20 * 1024 * 1024;
-const CONTENT_SECTIONS = ['overrides', 'messages', 'contact', 'social', 'images', 'gallery', 'event', 'stats'];
+const MAX_UPLOAD = 300 * 1024 * 1024;
+const UPLOAD_KINDS = { '.mp4': 'media', '.webm': 'media', '.m4v': 'media', '.pdf': 'docs', '.doc': 'docs', '.docx': 'docs', '.xlsx': 'docs', '.pptx': 'docs' };
+const CONTENT_SECTIONS = ['overrides', 'messages', 'contact', 'social', 'images', 'gallery', 'event', 'stats', 'news', 'articles', 'videos', 'documents'];
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(IMAGES_DIR, { recursive: true });
@@ -211,6 +218,11 @@ function allowForm(req) {
   return entry.count <= 15;
 }
 
+// Member accounts & membership fees (members.js)
+const members = require('./members')({
+  readJson, writeJson, send, readBody, clip, hashPassword, verifyPassword, sendMail, mailReady, siteUrl, allowForm, clientIp, ROOT
+});
+
 // ==========================================================================
 // API
 // ==========================================================================
@@ -237,6 +249,9 @@ async function handleApi(req, res, pathname) {
       email,
       phone: clip(body.phone, 60),
       notes: clip(body.notes, 4000),
+      ...(body.details && typeof body.details === 'object' && !Array.isArray(body.details)
+        ? { details: Object.fromEntries(Object.entries(body.details).slice(0, 30).map(([k, v]) => [clip(k, 40), clip(v, 300)])) }
+        : {}),
       lang: ['fa', 'ps', 'de', 'en'].includes(body.lang) ? body.lang : 'fa',
       date: new Date().toISOString(),
       read: false
@@ -286,10 +301,15 @@ async function handleApi(req, res, pathname) {
     return send(res, 200, { token: createSession(user.username, Boolean(body.remember)), user: publicUser(user) });
   }
 
+  // Membership applications and the member area have their own accounts
+  if (await members.handlePublic(req, res, resource, id, action)) return;
+
   // ---------- Everything below requires a signed-in studio user ----------
   const auth = sessionUser(req);
   if (!auth) return send(res, 401, { error: 'Please sign in again.' });
   const me = auth.user;
+
+  if (await members.handleAdmin(req, res, parts, me)) return;
 
   if (resource === 'logout' && method === 'POST') {
     sessions.delete(auth.token);
@@ -335,6 +355,42 @@ async function handleApi(req, res, pathname) {
     const name = `${base}-${Date.now().toString(36)}${ext}`;
     fs.writeFileSync(path.join(IMAGES_DIR, name), Buffer.from(match[2], 'base64'));
     return send(res, 201, { path: `images/${name}` });
+  }
+
+  // Large files (videos, documents) are streamed straight to disk instead of sent as JSON
+  if (resource === 'upload-file' && method === 'POST') {
+    const original = String(new URL(req.url, 'http://localhost').searchParams.get('name') || 'file');
+    const ext = path.extname(original).toLowerCase();
+    const folder = UPLOAD_KINDS[ext];
+    if (!folder) return send(res, 400, { error: 'Please upload an MP4/WebM video, or a PDF, Word, Excel or PowerPoint file.' });
+    if (Number(req.headers['content-length'] || 0) > MAX_UPLOAD) return send(res, 413, { error: 'That file is larger than 300 MB.' });
+    const base = path.basename(original, ext)
+      .normalize('NFKD').replace(/[^\w-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'file';
+    const name = `${base}-${Date.now().toString(36)}${ext}`;
+    fs.mkdirSync(path.join(ROOT, folder), { recursive: true });
+    const file = path.join(ROOT, folder, name);
+    try {
+      await new Promise((resolve, reject) => {
+        let size = 0;
+        const out = fs.createWriteStream(file);
+        req.on('data', (chunk) => {
+          size += chunk.length;
+          if (size > MAX_UPLOAD) {
+            req.unpipe(out);
+            out.destroy();
+            reject(Object.assign(new Error('That file is larger than 300 MB.'), { status: 413 }));
+          }
+        });
+        req.on('error', reject);
+        out.on('error', reject);
+        out.on('finish', resolve);
+        req.pipe(out);
+      });
+    } catch (e) {
+      fs.rmSync(file, { force: true });
+      throw e;
+    }
+    return send(res, 201, { path: `${folder}/${name}` });
   }
 
   if (resource === 'images' && method === 'GET') {
@@ -485,7 +541,8 @@ async function handleApi(req, res, pathname) {
   if (resource === 'backup' && method === 'GET') {
     return send(res, 200, {
       app: 'neuer-blick-studio', version: 3, exportedAt: new Date().toISOString(),
-      content: readJson('content.json', {}), submissions: readJson('submissions.json', []), subscribers: readJson('subscribers.json', [])
+      content: readJson('content.json', {}), submissions: readJson('submissions.json', []), subscribers: readJson('subscribers.json', []),
+      members: readJson('members.json', [])
     });
   }
 
@@ -495,6 +552,7 @@ async function handleApi(req, res, pathname) {
     writeJson('content.json', body.content);
     if (Array.isArray(body.submissions)) writeJson('submissions.json', body.submissions);
     if (Array.isArray(body.subscribers)) writeJson('subscribers.json', body.subscribers);
+    if (Array.isArray(body.members)) writeJson('members.json', body.members);
     return send(res, 200, { ok: true });
   }
 
@@ -508,9 +566,11 @@ const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
   '.webp': 'image/webp', '.gif': 'image/gif', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8'
+  '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.pdf': 'application/pdf', '.mp4': 'video/mp4', '.m4v': 'video/mp4', '.webm': 'video/webm',
+  '.doc': 'application/msword', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
 };
-const BLOCKED = new Set(['server.js', 'package.json', 'package-lock.json']);
+const BLOCKED = new Set(['server.js', 'members.js', 'package.json', 'package-lock.json']);
 
 function serveStatic(req, res, pathname) {
   let rel = decodeURIComponent(pathname);
@@ -530,11 +590,34 @@ function serveStatic(req, res, pathname) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('Not found');
     }
+    const type = MIME[path.extname(file).toLowerCase()] || 'application/octet-stream';
+    // Byte ranges let browsers seek inside videos without downloading them whole
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+    if (range && (range[1] || range[2])) {
+      const start = range[1] ? Number(range[1]) : Math.max(0, stat.size - Number(range[2]));
+      let end = range[1] && range[2] ? Number(range[2]) : stat.size - 1;
+      end = Math.min(end, stat.size - 1);
+      if (start > end || start >= stat.size) {
+        res.writeHead(416, { 'Content-Range': `bytes */${stat.size}` });
+        return res.end();
+      }
+      res.writeHead(206, {
+        'Content-Type': type,
+        'Content-Length': end - start + 1,
+        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-cache'
+      });
+      if (req.method === 'HEAD') return res.end();
+      return fs.createReadStream(file, { start, end }).pipe(res);
+    }
     res.writeHead(200, {
-      'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
+      'Content-Type': type,
       'Content-Length': stat.size,
+      'Accept-Ranges': 'bytes',
       'Cache-Control': 'no-cache'
     });
+    if (req.method === 'HEAD') return res.end();
     fs.createReadStream(file).pipe(res);
   });
 }

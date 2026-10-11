@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Neuer Blick | Member area</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="theme-color" content="#0f364f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="member.css" />
+  <link rel="stylesheet" href="scrollbars.css" />
+</head>
+<body>
+  <header class="mb-top">
+    <a class="mb-brand" href="index.html">
+      <span class="mb-mark">ن</span>
+      <span><strong data-i18n="brandName">انجمن نگاه نو</strong><small>Neuer Blick Verein e.V.</small></span>
+    </a>
+    <div class="mb-top-actions">
+      <div class="mb-langs" role="group" aria-label="Language">
+        <button type="button" data-lang="fa">FA</button>
+        <button type="button" data-lang="ps">PS</button>
+        <button type="button" data-lang="de">DE</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <button class="mb-icon-btn" type="button" id="themeToggle" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="mb-ghost-btn" href="index.html"><span data-i18n="mbBackSite">بازگشت به وبسایت</span></a>
+    </div>
+  </header>
+
+  <!-- Sign in -->
+  <main class="mb-login" id="loginView" hidden>
+    <section class="mb-login-art" aria-hidden="true">
+      <svg viewBox="0 0 600 520" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="mlSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0a2335"/>
+            <stop offset="0.55" stop-color="#1a5173"/>
+            <stop offset="1" stop-color="#e9a04a"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="520" fill="url(#mlSky)"/>
+        <circle class="ml-sun" cx="300" cy="350" r="60" fill="#ffd37e" opacity="0.9"/>
+        <path d="M0 400 L70 320 L120 360 L190 280 L250 350 L300 330 L330 400 Z" fill="#14364a"/>
+        <path d="M190 280 L206 298 L196 296 L188 306 L178 296 L172 300 Z" fill="#e8eef2" opacity=".8"/>
+        <rect x="96" y="320" width="14" height="80" rx="2" fill="#0b2433"/>
+        <rect x="92" y="336" width="22" height="5" fill="#d9a441"/>
+        <rect x="92" y="356" width="22" height="5" fill="#d9a441"/>
+        <path d="M380 400 V350 L400 330 L420 350 V400 Z M440 400 V340 L460 318 L480 340 V400 Z" fill="#0b2433"/>
+        <path d="M500 400 V360 L515 344 L530 360 V400 Z M535 400 V352 L552 336 L569 352 V400 Z" fill="#14364a"/>
+        <path class="ml-bridge" d="M110 400 Q300 230 500 400" fill="none" stroke="#ffd37e" stroke-width="6" stroke-linecap="round"/>
+        <rect y="400" width="600" height="120" fill="#0a2335"/>
+        <g class="ml-dove"><path d="M0 0 Q12 -14 26 -5 Q17 -2 12 5 Q5 2 0 0 Z" fill="#fff"/></g>
+      </svg>
+      <div class="mb-login-quote">
+        <p data-i18n="footerArtCaption">از کابل تا مونستر؛ پلی از فرهنگ، دوستی و امید</p>
+      </div>
+    </section>
+
+    <section class="mb-login-panel">
+      <form class="mb-card mb-login-form" id="loginForm" novalidate>
+        <span class="mb-badge">Neuer Blick e.V.</span>
+        <h1 data-i18n="mbLoginTitle">ورود اعضا</h1>
+        <p class="mb-muted" data-i18n="mbLoginSub"></p>
+        <label class="mb-field"><span data-i18n="mbEmail">ایمیل</span><input name="email" type="email" dir="ltr" required autocomplete="email" /></label>
+        <label class="mb-field"><span data-i18n="mbPassword">رمز عبور</span>
+          <span class="mb-pass"><input name="password" type="password" dir="ltr" required autocomplete="current-password" /><button type="button" class="mb-eye" data-toggle-pass aria-label="Show password">👁</button></span>
+        </label>
+        <label class="mb-check"><input type="checkbox" name="remember" /> <span data-i18n="mbRemember">مرا به خاطر بسپار</span></label>
+        <p class="mb-alert" id="loginError" role="alert" hidden></p>
+        <button class="mb-btn mb-btn-primary" type="submit"><span class="mb-spin" aria-hidden="true"></span><span data-i18n="mbLoginBtn">ورود</span></button>
+        <p class="mb-muted mb-center"><span data-i18n="mbNoAccount">هنوز عضو نیستید؟</span> <a href="index.html?join=1" data-i18n="mbApply">درخواست عضویت</a></p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Member profile -->
+  <main class="mb-app" id="appView" hidden>
+    <section class="mb-hero">
+      <div class="mb-avatar-wrap">
+        <div class="mb-avatar" id="avatar"></div>
+        <label class="mb-avatar-btn" title="Change photo">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span class="sr-only" data-i18n="mbChangePhoto">تغییر عکس</span>
+          <input type="file" id="avatarInput" accept="image/png,image/jpeg,image/webp" hidden />
+        </label>
+      </div>
+      <div class="mb-hero-text">
+        <h1 id="helloTitle"></h1>
+        <p data-i18n="mbWelcome"></p>
+        <div class="mb-chips">
+          <span class="mb-chip mb-chip-ok">● <span data-i18n="mbStatusActive">عضو فعال</span></span>
+          <span class="mb-chip" id="payChip"></span>
+          <span class="mb-chip mb-chip-soft"><span data-i18n="mbMemberNo">شماره عضویت</span>: <b id="heroNumber" dir="ltr"></b></span>
+        </div>
+      </div>
+      <button class="mb-ghost-btn mb-logout" type="button" id="logoutBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <span data-i18n="mbLogout">خروج</span>
+      </button>
+    </section>
+
+    <nav class="mb-tabs" role="tablist">
+      <button type="button" class="active" data-tab="overview" role="tab" data-i18n="mbOverview">نمای کلی</button>
+      <button type="button" data-tab="payments" role="tab" data-i18n="mbPaymentsTab">پرداخت‌ها</button>
+      <button type="button" data-tab="profile" role="tab" data-i18n="mbProfileTab">پروفایل</button>
+    </nav>
+
+    <!-- Overview -->
+    <section class="mb-tab-panel active" data-panel="overview">
+      <div class="mb-stats">
+        <article class="mb-stat"><small data-i18n="mbFeeYear">حق عضویت سالانه</small><strong id="statFee"></strong><span id="statFeeCat"></span></article>
+        <article class="mb-stat"><small data-i18n="mbTotalPaid">مجموع پرداخت‌ها</small><strong id="statPaid"></strong><span><span data-i18n="mbPaidThisYear">پرداخت امسال</span>: <b id="statPaidYear"></b></span></article>
+        <article class="mb-stat mb-stat-balance" id="balanceCard"><small data-i18n="mbBalance">مبلغ قابل پرداخت</small><strong id="statBalance"></strong><span id="statBalanceNote"></span></article>
+        <article class="mb-stat mb-stat-due">
+          <svg class="mb-ring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27"/><circle class="mb-ring-fill" id="dueRing" cx="32" cy="32" r="27"/></svg>
+          <div><small data-i18n="mbNextDue">تاریخ پرداخت بعدی</small><strong id="statNextDue"></strong><span id="statNextDueNote"></span></div>
+        </article>
+      </div>
+
+      <div class="mb-grid">
+        <article class="mb-member-card" id="memberCard">
+          <div class="mb-mc-top"><span class="mb-mark">ن</span><span>Neuer Blick Verein e.V.</span><span class="mb-mc-chip"></span></div>
+          <div class="mb-mc-name" id="cardName"></div>
+          <div class="mb-mc-number" id="cardNumber" dir="ltr"></div>
+          <div class="mb-mc-meta">
+            <div><small data-i18n="mbType">نوع عضویت</small><b id="cardType"></b></div>
+            <div><small data-i18n="mbMemberSince">عضو از</small><b id="cardSince"></b></div>
+            <div><small data-i18n="mbCardValid">پرداخت تا</small><b id="cardValid"></b></div>
+          </div>
+          <span class="mb-mc-label" data-i18n="mbCardTitle">کارت عضویت</span>
+        </article>
+
+        <article class="mb-card mb-pay">
+          <h2 data-i18n="mbHowToPay">پرداخت حق عضویت</h2>
+          <p class="mb-muted" data-i18n="mbHowToPayText"></p>
+          <dl class="mb-bank">
+            <div><dt data-i18n="jfBankHolderLabel">صاحب حساب</dt><dd dir="ltr" data-i18n="jfBankHolder"></dd></div>
+            <div><dt data-i18n="jfIbanLabel">IBAN</dt><dd dir="ltr"><span id="ibanText" data-i18n="jfIban"></span><button type="button" class="mb-copy" data-copy-from="ibanText" aria-label="Copy IBAN">⧉</button></dd></div>
+            <div><dt data-i18n="jfBicLabel">BIC</dt><dd dir="ltr" data-i18n="jfBic"></dd></div>
+            <div><dt data-i18n="jfRefLabel">موضوع پرداخت</dt><dd dir="ltr"><span id="payRef"></span><button type="button" class="mb-copy" data-copy-from="payRef" aria-label="Copy reference">⧉</button></dd></div>
+          </dl>
+        </article>
+
+        <article class="mb-card mb-event">
+          <h2 data-i18n="mbNextEvent">رویداد بعدی انجمن</h2>
+          <div class="mb-event-row">
+            <div class="mb-event-date"><b id="evDay"></b><span id="evMonth"></span></div>
+            <div><strong data-i18n="eventTitle"></strong><p class="mb-muted" id="evWhen"></p></div>
+          </div>
+          <a class="mb-btn mb-btn-soft" href="index.html#events"><span data-i18n="eventButton">ثبت‌نام در رویداد</span></a>
+        </article>
+
+        <article class="mb-card mb-links">
+          <h2 data-i18n="mbYourBenefits">مزایای عضویت شما</h2>
+          <ul class="mb-benefits">
+            <li data-i18n="benefit1"></li>
+            <li data-i18n="benefit2"></li>
+            <li data-i18n="benefit3"></li>
+          </ul>
+          <h3 data-i18n="mbQuickLinks">دسترسی سریع</h3>
+          <div class="mb-quick">
+            <a href="index.html#news"><span>✦</span><span data-i18n="navNews">اخبار</span></a>
+            <a href="index.html#documents"><span>❏</span><span data-i18n="navDocs">اسناد و نشرات</span></a>
+            <a href="index.html#gallery"><span>▣</span><span data-i18n="navGallery">گالری</span></a>
+            <a href="index.html#contact"><span>✉</span><span data-i18n="navContact">تماس با ما</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Payments -->
+    <section class="mb-tab-panel" data-panel="payments">
+      <article class="mb-card">
+        <h2 data-i18n="mbPayments">تاریخچه پرداخت‌ها</h2>
+        <div class="mb-years" id="yearsList"></div>
+        <div class="mb-table-wrap">
+          <table class="mb-table">
+            <thead><tr><th data-i18n="mbDate">تاریخ</th><th data-i18n="mbAmount">مبلغ</th><th data-i18n="mbMethod">شیوه پرداخت</th><th data-i18n="mbNote">یادداشت</th></tr></thead>
+            <tbody id="paymentsBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- Profile -->
+    <section class="mb-tab-panel" data-panel="profile">
+      <div class="mb-grid mb-grid-2">
+        <form class="mb-card" id="detailsForm" novalidate>
+          <h2 data-i18n="mbMyDetails">معلومات من</h2>
+          <div class="mb-readonly">
+            <div><small data-i18n="jfFirstName">نام</small><b id="pfName"></b></div>
+            <div><small data-i18n="mbEmail">ایمیل</small><b id="pfEmail" dir="ltr"></b></div>
+            <div><small data-i18n="jfBirth">تاریخ تولد</small><b id="pfBirth"></b></div>
+            <div><small data-i18n="mbType">نوع عضویت</small><b id="pfType"></b></div>
+          </div>
+          <label class="mb-field"><span data-i18n="jfPhone">شماره تلیفون</span><input name="phone" type="tel" dir="ltr" autocomplete="tel" /></label>
+          <label class="mb-field"><span data-i18n="jfStreet">سرک و شماره خانه</span><input name="street" required autocomplete="street-address" /></label>
+          <div class="mb-row">
+            <label class="mb-field"><span data-i18n="jfZip">کد پستی</span><input name="zip" required dir="ltr" autocomplete="postal-code" /></label>
+            <label class="mb-field"><span data-i18n="jfCity">شهر</span><input name="city" required autocomplete="address-level2" /></label>
+          </div>
+          <button class="mb-btn mb-btn-primary" type="submit"><span class="mb-spin" aria-hidden="true"></span><span data-i18n="mbSave">ذخیره تغییرات</span></button>
+        </form>
+
+        <form class="mb-card" id="passwordForm" novalidate>
+          <h2 data-i18n="mbChangePassword">تغییر رمز عبور</h2>
+          <label class="mb-field"><span data-i18n="mbCurrentPassword">رمز عبور فعلی</span><input name="current" type="password" dir="ltr" required autocomplete="current-password" /></label>
+          <label class="mb-field"><span data-i18n="mbNewPassword">رمز عبور جدید</span><input name="next" type="password" dir="ltr" required minlength="8" autocomplete="new-password" /></label>
+          <label class="mb-field"><span data-i18n="jfPassword2">تکرار رمز عبور</span><input name="repeat" type="password" dir="ltr" required minlength="8" autocomplete="new-password" /></label>
+          <button class="mb-btn mb-btn-primary" type="submit"><span class="mb-spin" aria-hidden="true"></span><span data-i18n="mbChangePassword">تغییر رمز عبور</span></button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div class="mb-toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="demo-api.js"></script>
+  <script src="site-data.js"></script>
+  <script src="member.js"></script>
+</body>
+</html>

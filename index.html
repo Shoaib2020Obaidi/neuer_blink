@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="انجمن نگاه نو در مونستر آلمان | Neuer Blick Verein e.V. - خانه فرهنگ، همبستگی و امید برای جامعه افغان در آلمان" />
   <title>انجمن نگاه نو | Neuer Blick Verein e.V.</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="theme-color" content="#0f364f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="scrollbars.css" />
 </head>
 <body>
   <!-- Scroll Progress Indicator -->
@@ -104,6 +107,15 @@
         <a href="#events" data-i18n="navEvents">رویدادها</a>
         <a href="#stories" data-i18n="navStories">داستان‌های ما</a>
         <a href="#gallery" data-i18n="navGallery">گالری</a>
+        <div class="nav-drop">
+          <button class="nav-drop-btn" type="button" aria-haspopup="true" aria-expanded="false"><span data-i18n="navMedia">رسانه</span> <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="nav-drop-menu">
+            <a href="#news"><span aria-hidden="true">✦</span> <span data-i18n="navNews">اخبار</span></a>
+            <a href="#articles"><span aria-hidden="true">✎</span> <span data-i18n="navArticles">مقالات و مطالب</span></a>
+            <a href="#videos"><span aria-hidden="true">▶</span> <span data-i18n="navVideos">ویدیوها</span></a>
+            <a href="#documents"><span aria-hidden="true">❏</span> <span data-i18n="navDocs">اسناد و نشرات</span></a>
+          </div>
+        </div>
         <a href="#membership" data-i18n="navMembership">عضویت</a>
         <a href="#contact" data-i18n="navContact">تماس با ما</a>
       </nav>
@@ -149,6 +161,11 @@
             </button>
           </div>
         </div>
+
+        <a class="member-link" id="memberLink" href="member.html">
+          <span class="member-avatar" id="memberAvatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+          <span data-i18n="mbHeaderLogin" id="memberLinkText">ورود اعضا</span>
+        </a>
 
         <a class="admin-link" href="admin.html" aria-label="Admin login">
           <span class="admin-icon">⌘</span>
@@ -235,6 +252,81 @@
         <b></b>
       </div>
     </section>
+
+    <!-- Cinematic journey: Afghanistan → through the clouds → Münster (driven by scroll) -->
+    <section class="journey" id="journey" aria-labelledby="jrTitleStart">
+      <div class="journey-stage" id="journeyStage">
+        <div class="jr-scene jr-af"><img src="images/journey-afghanistan.svg" data-img="journeyAfghanistan" alt="" /></div>
+        <div class="jr-scene jr-de"><img src="images/journey-germany.svg" data-img="journeyGermany" alt="" /></div>
+        <div class="jr-sky"></div>
+
+        <svg class="jr-defs" aria-hidden="true" width="0" height="0">
+          <defs>
+            <radialGradient id="jrCloudShade" cx="0.5" cy="0.35" r="0.7">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset="1" stop-color="#dfe8f1"/>
+            </radialGradient>
+            <symbol id="jrCloud" viewBox="0 0 400 180">
+              <path d="M60 150 Q10 150 14 112 Q18 78 62 80 Q70 34 120 36 Q150 0 200 18 Q240 -6 276 30 Q330 20 344 72 Q394 74 390 116 Q386 150 340 150 Z" fill="url(#jrCloudShade)"/>
+            </symbol>
+          </defs>
+        </svg>
+        <div class="jr-clouds" aria-hidden="true">
+          <svg class="jr-cloud" style="--x:-34;--y:-18;--s:1.1;--d:1" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:30;--y:-26;--s:0.8;--d:1.4" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:-12;--y:14;--s:1.4;--d:0.8" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:38;--y:20;--s:1.2;--d:1.1" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:-42;--y:30;--s:0.9;--d:1.6" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:8;--y:-38;--s:0.7;--d:1.8" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:-28;--y:-2;--s:1.6;--d:0.6" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+          <svg class="jr-cloud" style="--x:22;--y:2;--s:1.8;--d:0.5" viewBox="0 0 400 180"><use href="#jrCloud"/></svg>
+        </div>
+
+        <svg class="jr-route" viewBox="0 0 1000 420" aria-hidden="true">
+          <path id="jrPath" d="M840 300 C 700 80, 320 60, 170 250" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>
+          <g class="jr-pin" transform="translate(840 300)"><circle r="9" fill="#e27d1d"/><circle r="18" fill="none" stroke="#ffd37e" stroke-width="2" opacity=".7"/></g>
+          <g class="jr-pin" transform="translate(170 250)"><circle r="9" fill="#e27d1d"/><circle r="18" fill="none" stroke="#ffd37e" stroke-width="2" opacity=".7"/></g>
+          <text x="840" y="345" text-anchor="middle" class="jr-city" data-i18n="jrKabul">کابل</text>
+          <text x="170" y="295" text-anchor="middle" class="jr-city" data-i18n="jrMunster">مونستر</text>
+          <g id="jrPlane">
+            <path d="M-22 0 L18 -4 L26 0 L18 4 Z M2 -2 L-10 -22 L-4 -22 L12 -2 Z M2 2 L-10 22 L-4 22 L12 2 Z M-18 -1 L-26 -10 L-21 -10 L-12 -1 Z M-18 1 L-26 10 L-21 10 L-12 1 Z" fill="#fff"/>
+          </g>
+        </svg>
+
+        <div class="jr-captions">
+          <div class="jr-cap" data-cap="0">
+            <span class="jr-kicker" data-i18n="jrLabel">سفر ما</span>
+            <h2 id="jrTitleStart" data-i18n="jrStart">افغانستان</h2>
+            <p data-i18n="jrStartSub"></p>
+          </div>
+          <div class="jr-cap" data-cap="1">
+            <span class="jr-kicker" data-i18n="jrLabel">سفر ما</span>
+            <h2 data-i18n="jrMid">از فراز ابرها</h2>
+            <p data-i18n="jrMidSub"></p>
+          </div>
+          <div class="jr-cap" data-cap="2">
+            <span class="jr-kicker" data-i18n="jrLabel">سفر ما</span>
+            <h2 data-i18n="jrEnd">مونستر، آلمان</h2>
+            <p data-i18n="jrEndSub"></p>
+          </div>
+        </div>
+
+        <div class="jr-progress" aria-hidden="true">
+          <span data-i18n="jrKabul">کابل</span>
+          <b><i id="jrProgressFill"></i></b>
+          <span data-i18n="jrMunster">مونستر</span>
+        </div>
+        <div class="jr-hint" aria-hidden="true"><span data-i18n="jrScroll"></span><b></b></div>
+      </div>
+    </section>
+
+    <!-- Flight rail: a little plane follows the scroll; going back up it scatters flowers -->
+    <div class="flight-rail" id="flightRail" aria-hidden="true">
+      <span class="fr-end fr-top" data-i18n="jrKabul">کابل</span>
+      <span class="fr-line"><i id="frTrail"></i></span>
+      <span class="fr-plane" id="frPlane"><svg viewBox="-28 -24 56 48"><path d="M-22 0 L18 -4 L26 0 L18 4 Z M2 -2 L-10 -22 L-4 -22 L12 -2 Z M2 2 L-10 22 L-4 22 L12 2 Z M-18 -1 L-26 -10 L-21 -10 L-12 -1 Z M-18 1 L-26 10 L-21 10 L-12 1 Z"/></svg></span>
+      <span class="fr-end fr-bottom" data-i18n="jrMunster">مونستر</span>
+    </div>
 
     <!-- Afghan Motif Divider -->
     <div class="afghan-divider" aria-hidden="true">
@@ -592,6 +684,38 @@
         </div>
       </section>
 
+      <!-- News (managed in the studio: News & media) -->
+      <section class="library-section news-section section" id="news">
+        <div class="library-head" data-aos="fade-up">
+          <div>
+            <div class="section-label">
+              <span class="label-glyph" aria-hidden="true">✦</span>
+              <span data-i18n="labelNews">اخبار انجمن</span>
+            </div>
+            <h2 data-i18n="newsTitle">تازه‌ترین<br /><em>خبرها</em></h2>
+            <p class="section-subtext" data-i18n="newsSub"></p>
+          </div>
+          <button class="library-more" type="button" data-library-toggle="news" hidden><span data-i18n="showAll">نمایش همه</span></button>
+        </div>
+        <div class="news-grid" id="newsList" data-empty-key="emptyNews"></div>
+      </section>
+
+      <!-- Articles & writing -->
+      <section class="library-section articles-section section" id="articles">
+        <div class="library-head" data-aos="fade-up">
+          <div>
+            <div class="section-label">
+              <span class="label-glyph" aria-hidden="true">✎</span>
+              <span data-i18n="labelArticles">مقالات و مطالب</span>
+            </div>
+            <h2 data-i18n="articlesTitle">خواندنی‌ها،<br /><em>آموزش و تحلیل</em></h2>
+            <p class="section-subtext" data-i18n="articlesSub"></p>
+          </div>
+          <button class="library-more" type="button" data-library-toggle="articles" hidden><span data-i18n="showAll">نمایش همه</span></button>
+        </div>
+        <div class="articles-list" id="articlesList" data-empty-key="emptyArticles"></div>
+      </section>
+
       <!-- Section 05: Gallery with Interactive Lightbox -->
       <section class="gallery-section section" id="gallery">
         <div class="gallery-header-row" data-aos="fade-up">
@@ -615,6 +739,38 @@
             <span>🔍</span> <span data-i18n="galleryHint">روی هر تصویر کلیک کنید تا در اندازه بزرگ مشاهده نمایید.</span>
           </p>
         </div>
+      </section>
+
+      <!-- Videos -->
+      <section class="library-section videos-section section" id="videos">
+        <div class="library-head" data-aos="fade-up">
+          <div>
+            <div class="section-label">
+              <span class="label-glyph" aria-hidden="true">▶</span>
+              <span data-i18n="labelVideos">ویدیوها</span>
+            </div>
+            <h2 data-i18n="videosTitle">انجمن را<br /><em>تماشا کنید</em></h2>
+            <p class="section-subtext" data-i18n="videosSub"></p>
+          </div>
+          <button class="library-more" type="button" data-library-toggle="videos" hidden><span data-i18n="showAll">نمایش همه</span></button>
+        </div>
+        <div class="videos-grid" id="videosList" data-empty-key="emptyVideos"></div>
+      </section>
+
+      <!-- Documents & publications -->
+      <section class="library-section docs-section section" id="documents">
+        <div class="library-head" data-aos="fade-up">
+          <div>
+            <div class="section-label">
+              <span class="label-glyph" aria-hidden="true">❏</span>
+              <span data-i18n="labelDocs">اسناد و نشرات</span>
+            </div>
+            <h2 data-i18n="docsTitle">گزارش‌ها،<br /><em>قطعنامه‌ها و فایل‌ها</em></h2>
+            <p class="section-subtext" data-i18n="docsSub"></p>
+          </div>
+          <button class="library-more" type="button" data-library-toggle="documents" hidden><span data-i18n="showAll">نمایش همه</span></button>
+        </div>
+        <div class="docs-list" id="documentsList" data-empty-key="emptyDocs"></div>
       </section>
 
       <!-- Section: Quote / Words of Connection -->
@@ -802,6 +958,9 @@
             <a href="#activities" data-i18n="navActivities">فعالیت‌ها</a>
             <a href="#events" data-i18n="navEvents">رویدادها</a>
             <a href="#gallery" data-i18n="navGallery">گالری</a>
+            <a href="#news" data-i18n="navNews">اخبار</a>
+            <a href="#articles" data-i18n="navArticles">مقالات و مطالب</a>
+            <a href="#documents" data-i18n="navDocs">اسناد و نشرات</a>
             <a href="#faq" data-i18n="labelFaq">پرسش‌های پرتکرار</a>
             <a href="#membership" data-i18n="navMembership">عضویت</a>
           </div>
@@ -911,6 +1070,192 @@
     </div>
   </div>
 
+  <!-- Reader: full news item or article -->
+  <div class="action-modal reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerTitle">
+    <div class="action-modal-backdrop" data-reader-close></div>
+    <article class="action-modal-card reader-card">
+      <button class="modal-close-btn" type="button" data-reader-close aria-label="Close">✕</button>
+      <div class="reader-media" id="readerMedia"></div>
+      <div class="reader-body">
+        <div class="reader-meta" id="readerMeta"></div>
+        <h3 id="readerTitle" dir="auto"></h3>
+        <div class="reader-text" id="readerText" dir="auto"></div>
+        <div class="reader-extras" id="readerExtras"></div>
+      </div>
+    </article>
+    <button type="button" class="reader-zoom" id="readerZoom" hidden aria-label="Close picture"><img alt="" /></button>
+  </div>
+
+  <!-- Video player -->
+  <div class="action-modal video-modal" id="videoModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="videoTitle">
+    <div class="action-modal-backdrop" data-video-close></div>
+    <div class="video-card">
+      <button class="modal-close-btn" type="button" data-video-close aria-label="Close">✕</button>
+      <div class="video-frame" id="videoFrame"></div>
+      <h3 id="videoTitle" dir="auto"></h3>
+    </div>
+  </div>
+
+  <!-- Membership Application (based on the Mitgliedsantrag PDF) -->
+  <div class="action-modal join-modal" id="joinModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="joinTitle">
+    <div class="action-modal-backdrop" data-join-close></div>
+    <div class="action-modal-card join-card">
+      <button class="modal-close-btn" type="button" data-join-close aria-label="Close">✕</button>
+
+      <header class="join-hero">
+        <svg class="join-art" viewBox="0 0 760 260" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="jaSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0f364f"/>
+              <stop offset="0.6" stop-color="#1a5173"/>
+              <stop offset="1" stop-color="#e9a04a"/>
+            </linearGradient>
+            <radialGradient id="jaSun" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stop-color="#ffe1a0"/>
+              <stop offset="1" stop-color="#ffe1a0" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="760" height="260" fill="url(#jaSky)"/>
+          <circle class="ja-sun" cx="380" cy="128" r="70" fill="url(#jaSun)"/>
+          <circle cx="380" cy="128" r="24" fill="#ffd37e" opacity="0.9"/>
+          <!-- Afghanistan: mountains and minaret -->
+          <path d="M0 150 L60 92 L105 128 L160 70 L215 120 L260 96 L320 150 Z" fill="#14364a"/>
+          <path d="M160 70 L176 86 L168 84 L160 92 L152 84 L144 88 Z" fill="#e8eef2" opacity="0.85"/>
+          <path d="M60 92 L72 104 L60 101 L50 106 Z" fill="#e8eef2" opacity="0.7"/>
+          <rect x="86" y="96" width="12" height="58" rx="2" fill="#0b2433"/>
+          <rect x="83" y="108" width="18" height="4" fill="#d9a441"/>
+          <rect x="83" y="124" width="18" height="4" fill="#d9a441"/>
+          <path d="M86 96 Q92 84 98 96 Z" fill="#0b2433"/>
+          <!-- Germany: Münster cathedral and gabled houses -->
+          <path d="M470 150 V112 L486 96 L502 112 V150 Z M520 150 V104 L536 88 L552 104 V150 Z" fill="#0b2433"/>
+          <rect x="500" y="118" width="22" height="32" fill="#0b2433"/>
+          <path d="M574 150 V120 L590 104 L606 120 V150 Z M610 150 V116 L626 100 L642 116 V150 Z M646 150 V122 L660 108 L674 122 V150 Z M678 150 V114 L694 98 L710 114 V150 Z" fill="#14364a"/>
+          <path d="M582 128 h6 v6 h-6z M618 124 h6 v6 h-6z M654 130 h6 v6 h-6z M686 122 h6 v6 h-6z" fill="#ffd37e" opacity="0.8"/>
+          <!-- Bridge that draws itself -->
+          <path class="ja-bridge" d="M150 150 Q380 40 610 150" fill="none" stroke="#ffd37e" stroke-width="5" stroke-linecap="round"/>
+          <path class="ja-bridge ja-bridge-2" d="M150 150 Q380 70 610 150" fill="none" stroke="#e27d1d" stroke-width="3" stroke-linecap="round"/>
+          <rect x="0" y="150" width="760" height="110" fill="#0a2335"/>
+          <path d="M0 158 Q190 150 380 158 T760 158" fill="none" stroke="#1a5173" stroke-width="2"/>
+          <!-- Dove -->
+          <g class="ja-dove">
+            <path d="M0 0 Q10 -12 22 -4 Q14 -2 10 4 Q4 2 0 0 Z" fill="#fff"/>
+            <path class="ja-wing" d="M8 -3 Q14 -20 26 -18 Q18 -10 12 -2 Z" fill="#f6ecd8"/>
+          </g>
+          <!-- Floating saffron petals -->
+          <circle class="ja-petal" cx="240" cy="60" r="3" fill="#ffd37e"/>
+          <circle class="ja-petal" cx="520" cy="50" r="2.5" fill="#ffb347" style="animation-delay:-2s"/>
+          <circle class="ja-petal" cx="660" cy="70" r="2" fill="#ffd37e" style="animation-delay:-4s"/>
+          <circle class="ja-petal" cx="120" cy="40" r="2" fill="#ffb347" style="animation-delay:-1s"/>
+        </svg>
+        <div class="join-hero-text">
+          <span class="modal-badge" data-i18n="jfBadge">درخواست عضویت · Mitgliedsantrag</span>
+          <h3 id="joinTitle" data-i18n="jfTitle">به خانواده نگاه نو بپیوندید</h3>
+          <p data-i18n="jfSub">فرم درخواست عضویت در انجمن نگاه نو</p>
+        </div>
+      </header>
+
+      <div class="join-body">
+        <ol class="join-steps" aria-hidden="true">
+          <li class="active" data-step="1"><b>1</b><span data-i18n="jfStep1">معلومات شخصی</span></li>
+          <li data-step="2"><b>2</b><span data-i18n="jfStep2">عضویت و حق عضویت</span></li>
+          <li data-step="3"><b>3</b><span data-i18n="jfStep3">پرداخت و تأیید</span></li>
+        </ol>
+        <div class="join-progress"><span id="joinProgress"></span></div>
+
+        <form id="joinForm" class="join-form" novalidate>
+          <fieldset class="join-panel active" data-step="1">
+            <legend class="sr-only" data-i18n="jfStep1">معلومات شخصی</legend>
+            <div class="form-row">
+              <div class="form-group"><label for="jfFirst" data-i18n="jfFirstName">نام *</label><input id="jfFirst" name="firstName" required autocomplete="given-name" /></div>
+              <div class="form-group"><label for="jfLast" data-i18n="jfLastName">نام خانوادگی *</label><input id="jfLast" name="lastName" required autocomplete="family-name" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label for="jfBirth" data-i18n="jfBirth">تاریخ تولد *</label><input id="jfBirth" name="birthDate" type="date" required autocomplete="bday" /></div>
+              <div class="form-group"><label for="jfPhone" data-i18n="jfPhone">شماره تلیفون</label><input id="jfPhone" name="phone" type="tel" dir="ltr" placeholder="+49 ..." autocomplete="tel" /></div>
+            </div>
+            <div class="form-group"><label for="jfEmail" data-i18n="jfEmail">ایمیل آدرس *</label><input id="jfEmail" name="email" type="email" dir="ltr" required placeholder="name@example.de" autocomplete="email" /></div>
+            <div class="form-row">
+              <div class="form-group"><label for="jfPass" data-i18n="jfPassword">رمز عبور حساب کاربری *</label><input id="jfPass" name="password" type="password" dir="ltr" required minlength="8" autocomplete="new-password" /></div>
+              <div class="form-group"><label for="jfPass2" data-i18n="jfPassword2">تکرار رمز عبور *</label><input id="jfPass2" name="password2" type="password" dir="ltr" required minlength="8" autocomplete="new-password" /></div>
+            </div>
+            <p class="join-note join-pass-hint" data-i18n="jfPasswordHint"></p>
+            <div class="form-group"><label for="jfStreet" data-i18n="jfStreet">سرک و شماره خانه *</label><input id="jfStreet" name="street" required autocomplete="street-address" /></div>
+            <div class="form-row join-row-zip">
+              <div class="form-group"><label for="jfZip" data-i18n="jfZip">کد پستی *</label><input id="jfZip" name="zip" required inputmode="numeric" dir="ltr" autocomplete="postal-code" /></div>
+              <div class="form-group"><label for="jfCity" data-i18n="jfCity">شهر *</label><input id="jfCity" name="city" required autocomplete="address-level2" /></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="join-panel" data-step="2">
+            <legend class="join-legend" data-i18n="jfTypeTitle">اینجانب درخواست عضویت به شرح زیر را دارم</legend>
+            <div class="choice-grid">
+              <label class="choice-card"><input type="radio" name="memberType" value="ordinary" required /><span class="choice-icon">🤝</span><strong data-i18n="jfTypeOrdinary">عضو عادی</strong><small data-i18n="jfTypeOrdinaryDesc"></small></label>
+              <label class="choice-card"><input type="radio" name="memberType" value="supporting" /><span class="choice-icon">🌱</span><strong data-i18n="jfTypeSupporting">عضو حامی</strong><small data-i18n="jfTypeSupportingDesc"></small></label>
+              <label class="choice-card"><input type="radio" name="memberType" value="family" /><span class="choice-icon">👨‍👩‍👧‍👦</span><strong data-i18n="jfTypeFamily">عضویت خانوادگی</strong><small data-i18n="jfTypeFamilyDesc"></small></label>
+              <label class="choice-card"><input type="radio" name="memberType" value="other" /><span class="choice-icon">✨</span><strong data-i18n="jfTypeOther">سایر</strong><small data-i18n="jfTypeOtherDesc"></small></label>
+            </div>
+            <div class="form-group join-other" hidden><input id="jfOther" name="otherType" data-i18n-placeholder="jfTypeOtherPh" /></div>
+
+            <legend class="join-legend" data-i18n="jfFeeTitle">حق عضویت سالانه</legend>
+            <p class="join-note" data-i18n="jfFeeNote"></p>
+            <div class="fee-list">
+              <label class="fee-option"><input type="radio" name="fee" value="60" data-fee="employed" required /><span class="fee-amount">60</span><span class="fee-label" data-i18n="jfFee1"></span></label>
+              <label class="fee-option"><input type="radio" name="fee" value="24" data-fee="low-income" /><span class="fee-amount">24</span><span class="fee-label" data-i18n="jfFee2"></span></label>
+              <label class="fee-option"><input type="radio" name="fee" value="24" data-fee="student" /><span class="fee-amount">24</span><span class="fee-label" data-i18n="jfFee3"></span></label>
+              <label class="fee-option"><input type="radio" name="fee" value="120" data-fee="family" /><span class="fee-amount">120</span><span class="fee-label" data-i18n="jfFee4"></span></label>
+            </div>
+            <div class="fee-total"><span data-i18n="jfFeeTotal">حق عضویت شما</span><strong><b id="jfFeeTotal">–</b> <span data-i18n="jfPerYear">یورو / سال</span></strong></div>
+          </fieldset>
+
+          <fieldset class="join-panel" data-step="3">
+            <legend class="join-legend" data-i18n="jfPayTitle">شیوه پرداخت</legend>
+            <div class="pay-card">
+              <div class="pay-card-head"><span class="pay-chip"></span><strong data-i18n="jfPayTransfer">واریز بانکی</strong></div>
+              <p data-i18n="jfPayNote"></p>
+              <dl class="pay-details">
+                <div><dt data-i18n="jfBankHolderLabel">صاحب حساب</dt><dd dir="ltr" data-i18n="jfBankHolder"></dd></div>
+                <div><dt data-i18n="jfBankLabel">بانک</dt><dd dir="ltr" data-i18n="jfBankName"></dd></div>
+                <div><dt data-i18n="jfIbanLabel">IBAN</dt><dd dir="ltr"><span id="jfIbanText" data-i18n="jfIban"></span> <button type="button" class="pay-copy" id="jfCopyIban" aria-label="Copy IBAN">⧉</button></dd></div>
+                <div><dt data-i18n="jfBicLabel">BIC</dt><dd dir="ltr" data-i18n="jfBic"></dd></div>
+                <div><dt data-i18n="jfRefLabel">موضوع پرداخت</dt><dd data-i18n="jfRefValue"></dd></div>
+              </dl>
+            </div>
+            <label class="consent"><input type="checkbox" name="consent" required /><span data-i18n="jfConsent"></span></label>
+            <label class="consent"><input type="checkbox" name="privacy" required /><span data-i18n="jfPrivacy"></span></label>
+          </fieldset>
+
+          <p class="join-error" id="joinError" role="alert" hidden></p>
+
+          <div class="join-nav">
+            <button type="button" class="button button-glass join-back" id="joinBack" hidden><span data-i18n="jfBack">بازگشت</span></button>
+            <button type="button" class="button button-primary join-next" id="joinNext"><span data-i18n="jfNext">مرحله بعد</span> <span class="btn-arrow">←</span></button>
+            <button type="submit" class="button button-primary submit-btn join-submit" id="joinSubmit" hidden>
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span data-i18n="jfSubmit">ارسال درخواست عضویت</span>
+              <span class="btn-check">✓</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="join-done" id="joinDone" hidden>
+          <svg class="join-done-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>
+          <h4 data-i18n="jfDoneTitle">درخواست شما ثبت شد!</h4>
+          <p id="joinDoneText"></p>
+          <button type="button" class="button button-primary" data-join-close><span data-i18n="jfDoneClose">بستن</span></button>
+        </div>
+
+        <aside class="join-pdf">
+          <span class="join-pdf-icon" aria-hidden="true">PDF</span>
+          <div>
+            <strong data-i18n="jfPdfTitle">فرم کاغذی را ترجیح می‌دهید؟</strong>
+            <small data-i18n="jfPdfText"></small>
+          </div>
+          <a class="button button-glass join-pdf-btn" href="docs/Mitgliedsantrag_Neuer_Blick_Verein.pdf" download><span data-i18n="jfPdfBtn">دانلود فرم PDF</span> <span class="btn-arrow">↓</span></a>
+        </aside>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div class="toast-notification" id="toastNotification" role="alert" aria-live="polite">
     <span class="toast-icon">✓</span>
@@ -926,6 +1271,7 @@
   </button>
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="demo-api.js"></script>
   <script src="site-data.js"></script>
   <script src="script.js"></script>
 </body>

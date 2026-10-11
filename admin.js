@@ -532,12 +532,14 @@ function sessionExpired() {
 const VIEWS = {
   overview: { title: 'Overview', icon: 'i-home', render: renderOverview },
   inbox: { title: 'Inbox', icon: 'i-inbox', render: renderInbox },
+  members: { title: 'Members & finance', icon: 'i-chart', render: renderMembers },
   translations: { title: 'Texts & translations', icon: 'i-globe', render: renderTranslations, save: saveTranslations },
   announcements: { title: 'Announcements', icon: 'i-megaphone', render: renderAnnouncements, save: saveMessages },
   event: { title: 'Upcoming event', icon: 'i-calendar', render: renderEventView, save: saveEvent },
   contact: { title: 'Contact & social', icon: 'i-phone', render: renderContact, save: saveContact },
   media: { title: 'Website images', icon: 'i-image', render: renderImages, save: saveImages },
   gallery: { title: 'Photo gallery', icon: 'i-grid', render: renderGalleryEditor, save: saveGallery },
+  library: { title: 'News & media', icon: 'i-sparkle', render: renderLibraryView },
   users: { title: 'Users', icon: 'i-users', render: renderUsers },
   settings: { title: 'Settings & backup', icon: 'i-settings', render: renderSettings, save: saveStats }
 };
@@ -614,8 +616,12 @@ async function enterStudio(animated = false) {
   const hashView = location.hash.slice(1);
   go(VIEWS[hashView] ? hashView : 'overview');
   refreshInbox();
+  refreshMembersBadge();
   clearInterval(pollTimer);
-  pollTimer = setInterval(() => refreshInbox(true), 30000);
+  pollTimer = setInterval(() => {
+    refreshInbox(true);
+    refreshMembersBadge();
+  }, 30000);
   if (animated) toast(`${timeOfDayGreeting()}, ${me.username}!`);
 }
 
@@ -930,6 +936,7 @@ const TEXT_GROUPS = [
   ['Event', /^(labelEvent|event|tag|cd[A-Z]|addCalendar|shareEvent|linkCopied)/],
   ['Gallery & quote', /^(labelGallery|gallery|quote)/],
   ['Membership', /^(labelTogether|membership|benefit|art[A-Z])/],
+  ['Membership form', /^jf/],
   ['FAQ', /^(labelFaq|faq)/],
   ['Contact', /^(labelContact|contact|addressLabel|phoneLabel|emailLabel|act[A-Z]|copied)/],
   ['Footer', /^(footer|newsletter|social|dev[A-Z])/],
@@ -1279,7 +1286,9 @@ const IMAGE_SLOTS = [
   { key: 'activity3', label: 'Activity 3 · Youth & family', where: 'Activities section, third card', max: 1200 },
   { key: 'activity4', label: 'Activity 4 · Dialogue', where: 'Activities section, fourth card', max: 1200 },
   { key: 'eventImage', label: 'Event photo', where: 'Upcoming event card', max: 1600 },
-  { key: 'footerArt', label: 'Footer illustration', where: 'Kabul ↔ Münster artwork above the footer', max: 2200 }
+  { key: 'footerArt', label: 'Footer illustration', where: 'Kabul ↔ Münster artwork above the footer', max: 2200 },
+  { key: 'journeyAfghanistan', label: 'Journey · Afghanistan', where: 'First scene of the scrolling journey under the hero (a wide landscape photo works best)', max: 2400 },
+  { key: 'journeyGermany', label: 'Journey · Germany', where: 'Last scene of the scrolling journey, after the clouds', max: 2400 }
 ];
 let workingImages = {};
 
@@ -1833,6 +1842,987 @@ $('#pwForm')?.addEventListener('submit', async (e) => {
 });
 
 // ==========================================================================
+// VIEW: Members & finance
+// ==========================================================================
+const MEMBER_STATUS = {
+  pending: { label: 'Pending', tone: 'var(--saffron)' },
+  active: { label: 'Active', tone: 'var(--emerald)' },
+  deactivated: { label: 'Deactivated', tone: 'var(--muted)' },
+  rejected: { label: 'Rejected', tone: 'var(--pomegranate)' }
+};
+// Fixed status palette: each state also carries an icon and a label, never colour alone
+const PAY_STATUS = {
+  paid: { label: 'Paid up', icon: '✓', color: '#0ca30c' },
+  due: { label: 'Due', icon: '!', color: '#fab219' },
+  overdue: { label: 'Overdue', icon: '⚠', color: '#d03b3b' },
+  free: { label: 'No fee', icon: '∞', color: '#8a9a93' }
+};
+const MEMBER_TYPE_LABELS = { ordinary: 'Ordinary', supporting: 'Supporting', family: 'Family', other: 'Other' };
+const FEE_CATEGORY_LABELS = { employed: 'Employed', 'low-income': 'Unemployed / low income', student: 'Student / trainee', family: 'Family (> 2 children)' };
+const METHOD_LABELS = { transfer: 'Bank transfer', cash: 'Cash', other: 'Other' };
+const MEMBER_FILTERS = [['all', 'All'], ['active', 'Active'], ['pending', 'Pending'], ['unpaid', 'Fees due'], ['overdue', 'Overdue'], ['deactivated', 'Deactivated'], ['rejected', 'Rejected']];
+
+let membersData = [];
+let memberFees = {};
+let membersMailReady = false;
+let memberFilter = 'all';
+let memberQuery = '';
+let drawerMemberId = null;
+
+const euro = (n) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: Number(n) % 1 ? 2 : 0 }).format(Number(n) || 0);
+const shortDate = (iso) => (iso ? new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '–');
+const memberName = (m) => `${m.firstName || ''} ${m.lastName || ''}`.trim() || m.email;
+
+function memberAvatar(m, size = '') {
+  return m.avatar
+    ? `<span class="m-avatar ${size}"><img src="${escapeHtml(m.avatar)}" alt="" /></span>`
+    : `<span class="m-avatar ${size}">${escapeHtml(initialsOf(memberName(m)))}</span>`;
+}
+
+function payPill(m) {
+  if (m.status !== 'active') return '';
+  const s = PAY_STATUS[m.finance.status] || PAY_STATUS.paid;
+  return `<span class="pay-pill" style="--c:${s.color}"><b aria-hidden="true">${s.icon}</b>${s.label}</span>`;
+}
+
+function statusPill(m) {
+  const s = MEMBER_STATUS[m.status] || MEMBER_STATUS.pending;
+  return `<span class="m-status" style="--c:${s.tone}">${s.label}</span>`;
+}
+
+async function refreshMembersBadge() {
+  try {
+    const data = await api('members');
+    membersData = data.members;
+    paintMembersBadge();
+  } catch (e) { /* the badge is optional */ }
+}
+
+function paintMembersBadge() {
+  const pending = membersData.filter((m) => m.status === 'pending').length;
+  const badge = $('#membersBadge');
+  if (!badge) return;
+  badge.hidden = !pending;
+  badge.textContent = pending;
+}
+
+async function renderMembers() {
+  try {
+    const data = await api('members');
+    membersData = data.members;
+    memberFees = data.fees;
+    membersMailReady = data.mailReady;
+  } catch (e) {
+    toast(e.message, 'error');
+    return;
+  }
+  repaintMembers();
+  if (drawerMemberId) openMemberDrawer(drawerMemberId);
+}
+
+function paintMemberKpis() {
+  const active = membersData.filter((m) => m.status === 'active');
+  const year = String(new Date().getFullYear());
+  const payments = membersData.flatMap((m) => m.payments || []);
+  const thisYear = payments.filter((p) => String(p.date).startsWith(year));
+  const unpaid = active.filter((m) => m.finance.balance > 0);
+  $('#mkActive').textContent = active.length;
+  $('#mkActiveSub').textContent = `of ${membersData.length} accounts`;
+  $('#mkPending').textContent = membersData.filter((m) => m.status === 'pending').length;
+  $('#mkCollectedLabel').textContent = `Collected in ${year}`;
+  $('#mkCollected').textContent = euro(thisYear.reduce((s, p) => s + Number(p.amount), 0));
+  $('#mkCollectedSub').textContent = `${thisYear.length} payment${thisYear.length === 1 ? '' : 's'}`;
+  $('#mkOutstanding').textContent = euro(unpaid.reduce((s, m) => s + m.finance.balance, 0));
+  $('#mkOutstandingSub').textContent = `${unpaid.length} member${unpaid.length === 1 ? '' : 's'} with fees due`;
+  $('#mkOverdue').textContent = active.filter((m) => m.finance.status === 'overdue').length;
+}
+
+// Monthly collections: one series, bars anchored to the baseline, hover tooltip per month
+function paintFinanceChart() {
+  const months = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i -= 1) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label: d.toLocaleDateString('en-GB', { month: 'short' }), full: d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }), total: 0, count: 0 });
+  }
+  membersData.forEach((m) => (m.payments || []).forEach((p) => {
+    const month = months.find((x) => x.key === String(p.date).slice(0, 7));
+    if (month) {
+      month.total += Number(p.amount) || 0;
+      month.count += 1;
+    }
+  }));
+
+  const W = 720;
+  const H = 250;
+  const pad = { top: 22, right: 12, bottom: 30, left: 52 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+  const max = Math.max(...months.map((m) => m.total));
+  const step = max <= 0 ? 50 : [10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000].find((s) => s * 4 >= max) || Math.ceil(max / 4);
+  const top = step * 4;
+  const slot = plotW / months.length;
+  const barW = Math.min(34, slot * 0.58);
+  const y = (v) => pad.top + plotH - (v / top) * plotH;
+  const maxIndex = max > 0 ? months.findIndex((m) => m.total === max) : -1;
+
+  const grid = [0, 1, 2, 3, 4].map((i) => {
+    const v = step * i;
+    return `<line class="fc-grid" x1="${pad.left}" x2="${W - pad.right}" y1="${y(v)}" y2="${y(v)}"/>
+      <text class="fc-axis" x="${pad.left - 8}" y="${y(v) + 4}" text-anchor="end">${euro(v)}</text>`;
+  }).join('');
+
+  const bars = months.map((m, i) => {
+    const x = pad.left + slot * i + (slot - barW) / 2;
+    const h = (m.total / top) * plotH;
+    const r = Math.min(4, h / 2);
+    const baseY = pad.top + plotH;
+    // Rounded data end, square at the baseline
+    const shape = h > 0
+      ? `<path class="fc-bar" d="M${x},${baseY} V${baseY - h + r} Q${x},${baseY - h} ${x + r},${baseY - h} H${x + barW - r} Q${x + barW},${baseY - h} ${x + barW},${baseY - h + r} V${baseY} Z"/>`
+      : '';
+    const label = (i === maxIndex || i === months.length - 1) && m.total > 0
+      ? `<text class="fc-value" x="${x + barW / 2}" y="${baseY - h - 6}" text-anchor="middle">${euro(m.total)}</text>` : '';
+    return `<g class="fc-col" data-i="${i}">
+        <rect class="fc-hit" x="${pad.left + slot * i}" y="${pad.top}" width="${slot}" height="${plotH}"/>
+        ${shape}${label}
+        <text class="fc-axis" x="${x + barW / 2}" y="${H - 10}" text-anchor="middle">${m.label}</text>
+      </g>`;
+  }).join('');
+
+  $('#finChart').innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Fees collected per month over the last 12 months">
+      ${grid}
+      <line class="fc-base" x1="${pad.left}" x2="${W - pad.right}" y1="${pad.top + plotH}" y2="${pad.top + plotH}"/>
+      ${bars}
+    </svg>
+    <div class="fc-tip" id="fcTip" hidden></div>
+    ${max <= 0 ? '<p class="fc-empty">No payments recorded in the last 12 months yet.</p>' : ''}`;
+  $('#finTable').innerHTML = `<caption>Fees collected per month</caption><tr><th>Month</th><th>Total</th><th>Payments</th></tr>${months.map((m) => `<tr><td>${m.full}</td><td>${euro(m.total)}</td><td>${m.count}</td></tr>`).join('')}`;
+
+  const chart = $('#finChart');
+  const tip = $('#fcTip');
+  chart.onmousemove = (e) => {
+    const col = e.target.closest('.fc-col');
+    $$('.fc-col', chart).forEach((c) => c.classList.toggle('hover', c === col));
+    if (!col) {
+      tip.hidden = true;
+      return;
+    }
+    const m = months[Number(col.dataset.i)];
+    tip.innerHTML = `<strong>${m.full}</strong><span>${euro(m.total)}</span><small>${m.count} payment${m.count === 1 ? '' : 's'}</small>`;
+    tip.hidden = false;
+    const box = chart.getBoundingClientRect();
+    const left = Math.min(box.width - tip.offsetWidth - 4, Math.max(4, e.clientX - box.left - tip.offsetWidth / 2));
+    tip.style.left = `${left}px`;
+    tip.style.top = `${Math.max(0, e.clientY - box.top - tip.offsetHeight - 14)}px`;
+  };
+  chart.onmouseleave = () => {
+    tip.hidden = true;
+    $$('.fc-col', chart).forEach((c) => c.classList.remove('hover'));
+  };
+}
+
+function paintStatusBar() {
+  const active = membersData.filter((m) => m.status === 'active');
+  const counts = Object.fromEntries(Object.keys(PAY_STATUS).map((k) => [k, active.filter((m) => m.finance.status === k).length]));
+  $('#statusSub').textContent = `${active.length} active member${active.length === 1 ? '' : 's'}`;
+  $('#statusBar').innerHTML = active.length
+    ? Object.entries(counts).filter(([, n]) => n).map(([k, n]) => `<span class="sb-seg" style="flex:${n};--c:${PAY_STATUS[k].color}" title="${PAY_STATUS[k].label}: ${n}" aria-label="${PAY_STATUS[k].label}: ${n}"></span>`).join('')
+    : '<span class="sb-empty"></span>';
+  $('#statusLegend').innerHTML = Object.entries(PAY_STATUS).map(([k, s]) => `
+    <li><button type="button" data-member-filter="${k === 'paid' || k === 'free' ? 'active' : k === 'due' ? 'unpaid' : 'overdue'}">
+      <span class="lg-icon" style="--c:${s.color}">${s.icon}</span>${s.label}
+      <b>${counts[k]}</b><small>${active.length ? Math.round((counts[k] / active.length) * 100) : 0}%</small>
+    </button></li>`).join('');
+}
+
+function paintTypeBars() {
+  const pool = membersData.filter((m) => m.status === 'active' || m.status === 'pending');
+  const counts = Object.keys(MEMBER_TYPE_LABELS).map((k) => [k, pool.filter((m) => m.memberType === k).length]);
+  const max = Math.max(1, ...counts.map(([, n]) => n));
+  $('#memberTypeBars').innerHTML = counts.map(([k, n]) => `
+    <div class="hbar" title="${MEMBER_TYPE_LABELS[k]}: ${n}">
+      <span>${MEMBER_TYPE_LABELS[k]}</span>
+      <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
+      <b>${n}</b>
+    </div>`).join('');
+}
+
+function paintPending() {
+  const pending = membersData.filter((m) => m.status === 'pending');
+  $('#pendingPanel').hidden = !pending.length;
+  $('#pendingCount').textContent = pending.length;
+  $('#pendingList').innerHTML = pending.map((m) => `
+    <article class="pending-card" data-member="${escapeHtml(m.id)}">
+      <div class="pending-top">
+        ${memberAvatar(m)}
+        <div>
+          <strong>${escapeHtml(memberName(m))}</strong>
+          <a href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a>
+        </div>
+        <span class="pending-time" title="${escapeHtml(new Date(m.createdAt).toLocaleString('en-GB'))}">${relativeTime(m.createdAt)}</span>
+      </div>
+      <dl class="pending-facts">
+        <div><dt>Membership</dt><dd>${MEMBER_TYPE_LABELS[m.memberType] || '–'}${m.otherType ? `: ${escapeHtml(m.otherType)}` : ''}</dd></div>
+        <div><dt>Fee</dt><dd>${euro(m.fee)} / year · ${FEE_CATEGORY_LABELS[m.feeCategory] || ''}</dd></div>
+        <div><dt>Born</dt><dd>${shortDate(m.birthDate)}</dd></div>
+        <div><dt>Phone</dt><dd dir="ltr">${escapeHtml(m.phone || '–')}</dd></div>
+        <div class="wide"><dt>Address</dt><dd>${escapeHtml(`${m.street}, ${m.zip} ${m.city}`)}</dd></div>
+      </dl>
+      <div class="pending-actions">
+        <button class="btn btn-soft sm" type="button" data-member-open="${escapeHtml(m.id)}">Details</button>
+        <button class="btn btn-soft sm danger-text" type="button" data-member-action="reject" data-id="${escapeHtml(m.id)}">Reject</button>
+        <button class="btn btn-primary sm" type="button" data-member-action="approve" data-id="${escapeHtml(m.id)}"><svg class="ico"><use href="#i-check"/></svg> Approve</button>
+      </div>
+    </article>`).join('');
+}
+
+function filteredMembers() {
+  const q = memberQuery.toLowerCase();
+  return membersData
+    .filter((m) => {
+      if (memberFilter === 'all') return true;
+      if (memberFilter === 'unpaid') return m.status === 'active' && m.finance.balance > 0;
+      if (memberFilter === 'overdue') return m.status === 'active' && m.finance.status === 'overdue';
+      return m.status === memberFilter;
+    })
+    .filter((m) => !q || [memberName(m), m.email, m.memberNumber, m.city, m.phone].some((v) => String(v || '').toLowerCase().includes(q)))
+    .sort((a, b) => {
+      const order = { pending: 0, active: 1, deactivated: 2, rejected: 3 };
+      return (order[a.status] - order[b.status]) || memberName(a).localeCompare(memberName(b));
+    });
+}
+
+function paintMemberTable() {
+  const count = (key) => membersData.filter((m) => {
+    if (key === 'all') return true;
+    if (key === 'unpaid') return m.status === 'active' && m.finance.balance > 0;
+    if (key === 'overdue') return m.status === 'active' && m.finance.status === 'overdue';
+    return m.status === key;
+  }).length;
+  $('#memberFilters').innerHTML = MEMBER_FILTERS.map(([key, label]) => `<button class="chip ${memberFilter === key ? 'active' : ''}" type="button" data-member-filter="${key}">${label}<span class="count">${count(key)}</span></button>`).join('');
+
+  const rows = filteredMembers();
+  $('#memberRows').innerHTML = rows.length ? rows.map((m) => {
+    const f = m.finance;
+    const active = m.status === 'active';
+    return `
+      <tr data-member-open="${escapeHtml(m.id)}" tabindex="0">
+        <td><div class="m-cell">${memberAvatar(m)}<div><strong>${escapeHtml(memberName(m))}</strong><small>${escapeHtml(m.email)}</small></div></div></td>
+        <td class="mono">${escapeHtml(m.memberNumber || '–')}</td>
+        <td>${MEMBER_TYPE_LABELS[m.memberType] || '–'}</td>
+        <td class="num">${euro(m.fee)}</td>
+        <td class="num">${active ? euro(f.paidThisYear) : '–'}</td>
+        <td class="num ${active && f.balance > 0 ? 'neg' : ''}">${active ? euro(Math.max(0, f.balance)) : '–'}</td>
+        <td>${active && f.nextDueDate ? shortDate(f.nextDueDate) : '–'}</td>
+        <td><div class="m-pills">${statusPill(m)}${payPill(m)}</div></td>
+      </tr>`;
+  }).join('') : `<tr><td colspan="8">${emptyState('i-users', membersData.length ? 'Nobody matches' : 'No members yet', membersData.length ? 'Try another filter or search.' : 'Applications from the website’s membership form appear here.')}</td></tr>`;
+}
+
+// ---------- Member drawer ----------
+function openMemberDrawer(id) {
+  const m = membersData.find((x) => x.id === id);
+  if (!m) return closeMemberDrawer();
+  drawerMemberId = id;
+  const f = m.finance;
+  const active = m.status === 'active';
+  const today = new Date().toISOString().slice(0, 10);
+  const actions = {
+    pending: `<button class="btn btn-soft sm danger-text" type="button" data-member-action="reject" data-id="${m.id}">Reject</button>
+              <button class="btn btn-primary sm" type="button" data-member-action="approve" data-id="${m.id}"><svg class="ico"><use href="#i-check"/></svg> Approve</button>`,
+    active: `<button class="btn btn-soft sm danger-text" type="button" data-member-action="deactivate" data-id="${m.id}">Deactivate</button>`,
+    deactivated: `<button class="btn btn-primary sm" type="button" data-member-action="reactivate" data-id="${m.id}">Reactivate</button>`,
+    rejected: `<button class="btn btn-primary sm" type="button" data-member-action="reactivate" data-id="${m.id}">Approve after all</button>`
+  }[m.status];
+
+  $('#drawerBody').innerHTML = `
+    <header class="dr-head">
+      ${memberAvatar(m, 'lg')}
+      <div>
+        <h3 id="drawerTitle">${escapeHtml(memberName(m))}</h3>
+        <a href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a>
+        <div class="m-pills">${statusPill(m)}${payPill(m)}${m.memberNumber ? `<span class="m-num">${escapeHtml(m.memberNumber)}</span>` : ''}</div>
+      </div>
+      <button class="mini-btn" type="button" data-drawer-close aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button>
+    </header>
+    <div class="dr-actions">${actions}</div>
+    ${m.statusNote ? `<p class="dr-note"><b>${MEMBER_STATUS[m.status]?.label} note:</b> ${escapeHtml(m.statusNote)} <small>${m.statusChangedBy ? `by ${escapeHtml(m.statusChangedBy)}` : ''} ${m.statusChangedAt ? relativeTime(m.statusChangedAt) : ''}</small></p>` : ''}
+
+    ${active ? `
+    <section class="dr-section">
+      <h4>Fees</h4>
+      <div class="dr-stats">
+        <div><small>Fee / year</small><b>${euro(f.fee)}</b></div>
+        <div><small>Total paid</small><b>${euro(f.paid)}</b></div>
+        <div class="${f.balance > 0 ? 'neg' : ''}"><small>Balance due</small><b>${euro(Math.max(0, f.balance))}</b></div>
+        <div><small>Next due</small><b>${f.nextDueDate ? shortDate(f.nextDueDate) : '–'}</b></div>
+      </div>
+      <form class="dr-pay" id="payForm">
+        <label class="input-label">Amount (€)<input name="amount" type="number" min="0.01" step="0.01" value="${f.balance > 0 ? f.balance : f.fee}" required /></label>
+        <label class="input-label">Date<input name="date" type="date" value="${today}" max="${today}" required /></label>
+        <label class="input-label">Method<select name="method">${Object.entries(METHOD_LABELS).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label>
+        <label class="input-label wide">Note <small>(optional, the member can see it)</small><input name="note" maxlength="300" placeholder="e.g. Beitrag 2026" /></label>
+        <button class="btn btn-primary" type="submit"><svg class="ico"><use href="#i-plus"/></svg> Record payment</button>
+      </form>
+      <div class="dr-payments">
+        ${(m.payments || []).length ? m.payments.map((p) => `
+          <div class="dr-payment">
+            <span class="dr-pay-amount">${euro(p.amount)}</span>
+            <span>${shortDate(p.date)} · ${METHOD_LABELS[p.method] || p.method}${p.note ? ` · ${escapeHtml(p.note)}` : ''}<small>recorded by ${escapeHtml(p.recordedBy || '–')}</small></span>
+            <button class="mini-btn danger" type="button" data-payment-delete="${escapeHtml(p.id)}" title="Remove payment" aria-label="Remove payment"><svg class="ico"><use href="#i-trash"/></svg></button>
+          </div>`).join('') : '<p class="hint">No payments recorded yet.</p>'}
+      </div>
+    </section>` : ''}
+
+    <section class="dr-section">
+      <h4>Details</h4>
+      <form class="form-grid" id="memberEditForm">
+        <label class="input-label">First name<input name="firstName" value="${escapeHtml(m.firstName)}" /></label>
+        <label class="input-label">Last name<input name="lastName" value="${escapeHtml(m.lastName)}" /></label>
+        <label class="input-label">Date of birth<input name="birthDate" type="date" value="${escapeHtml(m.birthDate)}" /></label>
+        <label class="input-label">Phone<input name="phone" dir="ltr" value="${escapeHtml(m.phone)}" /></label>
+        <label class="input-label full">Street &amp; house number<input name="street" value="${escapeHtml(m.street)}" /></label>
+        <label class="input-label">Postcode<input name="zip" value="${escapeHtml(m.zip)}" /></label>
+        <label class="input-label">City<input name="city" value="${escapeHtml(m.city)}" /></label>
+        <label class="input-label">Membership<select name="memberType">${Object.entries(MEMBER_TYPE_LABELS).map(([v, l]) => `<option value="${v}" ${m.memberType === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="input-label">Fee category<select name="feeCategory">${Object.entries(FEE_CATEGORY_LABELS).map(([v, l]) => `<option value="${v}" ${m.feeCategory === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="input-label">Fee per year (€)<input name="fee" type="number" min="0" step="0.01" value="${m.fee}" /></label>
+        ${active ? `<label class="input-label">Member since<input name="joinedAt" type="date" value="${escapeHtml(m.joinedAt || '')}" /></label>` : ''}
+        <label class="input-label full">Admin notes <small>(only admins see this)</small><textarea name="adminNotes" rows="3">${escapeHtml(m.adminNotes)}</textarea></label>
+        <div class="full dr-form-foot">
+          <span class="hint">Applied ${relativeTime(m.createdAt)}${m.lastLogin ? ` · last sign-in ${relativeTime(m.lastLogin)}` : ''}</span>
+          <button class="btn btn-primary" type="submit"><svg class="ico"><use href="#i-save"/></svg> Save details</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="dr-section dr-danger">
+      <button class="btn btn-danger" type="button" data-member-delete="${m.id}"><svg class="ico"><use href="#i-trash"/></svg> Delete member permanently</button>
+    </section>`;
+  $('#memberDrawer').hidden = false;
+  document.body.classList.add('drawer-open');
+}
+
+function closeMemberDrawer() {
+  drawerMemberId = null;
+  $('#memberDrawer').hidden = true;
+  document.body.classList.remove('drawer-open');
+}
+
+function repaintMembers() {
+  paintMembersBadge();
+  paintMemberKpis();
+  paintFinanceChart();
+  paintStatusBar();
+  paintTypeBars();
+  paintPending();
+  paintMemberTable();
+}
+
+function replaceMember(updated) {
+  const index = membersData.findIndex((m) => m.id === updated.id);
+  if (index === -1) membersData.push(updated);
+  else membersData[index] = updated;
+  repaintMembers();
+  if (drawerMemberId === updated.id) openMemberDrawer(updated.id);
+}
+
+// ---------- Approve / reject / deactivate / reactivate ----------
+const MEMBER_ACTIONS = {
+  approve: { title: 'Approve this application?', text: (m) => `${memberName(m)} gets a member number and can sign in to the member area.`, confirm: 'Approve', notify: true, reason: false, icon: '✓' },
+  reject: { title: 'Reject this application?', text: (m) => `${memberName(m)} will not be able to sign in. You can still approve them later.`, confirm: 'Reject', notify: false, reason: true, icon: '!' },
+  deactivate: { title: 'Deactivate this member?', text: (m) => `${memberName(m)} is signed out and cannot sign in until you reactivate the account. Payments and details are kept.`, confirm: 'Deactivate', notify: false, reason: true, icon: '!' },
+  reactivate: { title: 'Reactivate this member?', text: (m) => `${memberName(m)} can sign in to the member area again.`, confirm: 'Reactivate', notify: true, reason: false, icon: '✓' }
+};
+
+function askMemberAction(action, id) {
+  const m = membersData.find((x) => x.id === id);
+  const def = MEMBER_ACTIONS[action];
+  if (!m || !def) return;
+  $('#maTitle').textContent = def.title;
+  $('#maText').textContent = def.text(m);
+  $('#maIcon').textContent = def.icon;
+  $('#maIcon').classList.toggle('ok', def.icon === '✓');
+  $('#maReasonWrap').hidden = !def.reason;
+  $('#maReason').value = '';
+  $('#maMessage').value = '';
+  $('#maNotify').checked = def.notify && membersMailReady;
+  $('#maNotify').disabled = !membersMailReady;
+  $('#maMessageWrap').hidden = !$('#maNotify').checked;
+  $('#maMailHint').textContent = membersMailReady
+    ? 'The email is written in the language the member applied in. Your message is added as it is.'
+    : 'Email is not set up yet (Settings → Email), so the member will not be notified.';
+  $('#maConfirm').textContent = def.confirm;
+  $('#maConfirm').className = `btn ${def.reason ? 'btn-danger' : 'btn-primary'}`;
+  const form = $('#memberActionForm');
+  form.dataset.action = action;
+  form.dataset.id = id;
+  $('#memberActionDialog').hidden = false;
+  setTimeout(() => (def.reason ? $('#maReason') : $('#maConfirm')).focus(), 50);
+}
+
+$('#maNotify')?.addEventListener('change', (e) => { $('#maMessageWrap').hidden = !e.target.checked; });
+$$('[data-action-cancel]').forEach((el) => el.addEventListener('click', () => { $('#memberActionDialog').hidden = true; }));
+
+$('#memberActionForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const { action, id } = form.dataset;
+  const button = $('#maConfirm');
+  button.disabled = true;
+  try {
+    const data = await api(`members/${encodeURIComponent(id)}/${action}`, {
+      method: 'POST',
+      body: { notify: $('#maNotify').checked, message: $('#maMessage').value.trim(), reason: $('#maReason').value.trim() }
+    });
+    $('#memberActionDialog').hidden = true;
+    replaceMember(data.member);
+    const done = { approve: 'Application approved', reject: 'Application rejected', deactivate: 'Member deactivated', reactivate: 'Member reactivated' }[action];
+    if (data.mail?.sent) toast(`${done}. Email sent to ${data.member.email}.`);
+    else if ($('#maNotify').checked) toast(`${done}, but the email could not be sent: ${data.mail?.reason || 'unknown error'}`, 'error');
+    else toast(`${done}.`);
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// ---------- Events ----------
+document.addEventListener('click', (e) => {
+  if (!$('.view[data-view="members"]')?.classList.contains('active') && !e.target.closest('#memberDrawer')) return;
+  const filter = e.target.closest('[data-member-filter]');
+  if (filter) {
+    memberFilter = filter.dataset.memberFilter;
+    paintMemberTable();
+    if (!filter.closest('#memberFilters')) $('#memberRows').closest('.panel').scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    return;
+  }
+  const action = e.target.closest('[data-member-action]');
+  if (action) {
+    askMemberAction(action.dataset.memberAction, action.dataset.id);
+    return;
+  }
+  const open = e.target.closest('[data-member-open]');
+  if (open && !e.target.closest('a')) {
+    openMemberDrawer(open.dataset.memberOpen);
+    return;
+  }
+  if (e.target.closest('[data-drawer-close]')) closeMemberDrawer();
+});
+
+$('#memberRows')?.addEventListener('keydown', (e) => {
+  const row = e.target.closest('[data-member-open]');
+  if (row && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    openMemberDrawer(row.dataset.memberOpen);
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!$('#memberActionDialog').hidden) $('#memberActionDialog').hidden = true;
+  else if (!$('#memberDrawer').hidden) closeMemberDrawer();
+});
+
+$('#memberSearch')?.addEventListener('input', (e) => {
+  memberQuery = e.target.value.trim();
+  paintMemberTable();
+});
+
+$('#drawerBody')?.addEventListener('change', (e) => {
+  // Picking a fee category fills in its standard fee
+  if (e.target.name === 'feeCategory' && memberFees[e.target.value] !== undefined) {
+    e.target.form.fee.value = memberFees[e.target.value];
+  }
+});
+
+$('#drawerBody')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const button = $('button[type="submit"]', form);
+  button.disabled = true;
+  try {
+    if (form.id === 'payForm') {
+      const data = await api(`members/${encodeURIComponent(drawerMemberId)}/payments`, {
+        method: 'POST',
+        body: { amount: Number(form.amount.value), date: form.date.value, method: form.method.value, note: form.note.value.trim() }
+      });
+      replaceMember(data.member);
+      toast(`Payment of ${euro(form.amount.value)} recorded.`);
+    }
+    if (form.id === 'memberEditForm') {
+      const body = Object.fromEntries(new FormData(form).entries());
+      body.fee = Number(body.fee);
+      const data = await api(`members/${encodeURIComponent(drawerMemberId)}`, { method: 'PUT', body });
+      replaceMember(data.member);
+      toast('Member details saved.');
+    }
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$('#drawerBody')?.addEventListener('click', async (e) => {
+  const pay = e.target.closest('[data-payment-delete]');
+  if (pay) {
+    const ok = await confirmAction('Remove this payment?', 'The member’s balance and next due date are recalculated.', 'Remove');
+    if (!ok) return;
+    try {
+      const data = await api(`members/${encodeURIComponent(drawerMemberId)}/payments/${encodeURIComponent(pay.dataset.paymentDelete)}`, { method: 'DELETE' });
+      replaceMember(data.member);
+      toast('Payment removed.');
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+  const del = e.target.closest('[data-member-delete]');
+  if (del) {
+    const m = membersData.find((x) => x.id === del.dataset.memberDelete);
+    const ok = await confirmAction('Delete this member permanently?', `${memberName(m)}, their payments and profile photo are removed for good. To keep the history, deactivate them instead.`, 'Delete');
+    if (!ok) return;
+    try {
+      await api(`members/${encodeURIComponent(m.id)}`, { method: 'DELETE' });
+      membersData = membersData.filter((x) => x.id !== m.id);
+      closeMemberDrawer();
+      repaintMembers();
+      toast('Member deleted.');
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+});
+
+$('#exportMembers')?.addEventListener('click', () => {
+  const cols = ['Member number', 'Status', 'First name', 'Last name', 'Email', 'Phone', 'Street', 'Postcode', 'City', 'Date of birth', 'Membership', 'Fee category', 'Fee per year', 'Member since', 'Total paid', 'Paid this year', 'Balance', 'Next due', 'Payment status'];
+  const rows = filteredMembers().map((m) => [
+    m.memberNumber, MEMBER_STATUS[m.status]?.label, m.firstName, m.lastName, m.email, m.phone, m.street, m.zip, m.city, m.birthDate,
+    MEMBER_TYPE_LABELS[m.memberType], FEE_CATEGORY_LABELS[m.feeCategory], m.fee, m.joinedAt || '', m.finance.paid, m.finance.paidThisYear,
+    m.status === 'active' ? Math.max(0, m.finance.balance) : '', m.finance.nextDueDate || '', m.status === 'active' ? PAY_STATUS[m.finance.status]?.label : ''
+  ]);
+  const csv = [cols, ...rows].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+  downloadFile(`neuer-blick-members-${new Date().toISOString().slice(0, 10)}.csv`, `﻿${csv}`, 'text/csv;charset=utf-8');
+});
+
+// ==========================================================================
+// VIEW: News & media (news, articles, videos, documents)
+// ==========================================================================
+const LIB_TYPES = {
+  news: { single: 'news item', label: 'News', image: true },
+  articles: { single: 'article', label: 'Articles', image: true, categories: { article: 'Article', educational: 'Educational', analysis: 'Analysis', writing: 'Writing' }, author: true },
+  videos: { single: 'video', label: 'Videos', image: true, video: true },
+  documents: { single: 'document', label: 'Documents & resolutions', image: true, categories: { report: 'Report', resolution: 'Resolution', announcement: 'Announcement', file: 'File' }, file: true }
+};
+const LIB_LANGS = [['fa', 'فارسی', 'rtl'], ['ps', 'پښتو', 'rtl'], ['de', 'Deutsch', 'ltr'], ['en', 'English', 'ltr']];
+let libType = 'news';
+let libQuery = '';
+let libDraft = null;
+
+function getLib(type) {
+  const list = Array.isArray(content[type]) ? content[type] : (DEFAULT_LIBRARY[type] || []);
+  return clone(list).filter((item) => item && item.id);
+}
+
+const firstText = (field) => (field && (field.fa || field.ps || field.de || field.en)) || '';
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+function youtubeThumb(url) {
+  const match = String(url || '').match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/i);
+  return match ? `https://i.ytimg.com/vi/${match[1]}/hqdefault.jpg` : '';
+}
+
+const isVideoLink = (url) => Boolean(youtubeThumb(url)) || /vimeo\.com\/(video\/)?\d+/i.test(url) || /^(https?:\/\/|docs\/|images\/|media\/).+\.(mp4|webm|m4v|ogg)(\?.*)?$/i.test(url);
+
+function renderLibraryView() {
+  libDraft = null;
+  $('#libEditor').hidden = true;
+  $('#libEditor').innerHTML = '';
+  paintLibList();
+}
+
+function paintLibList() {
+  const def = LIB_TYPES[libType];
+  Object.keys(LIB_TYPES).forEach((type) => { $(`[data-count="${type}"]`).textContent = getLib(type).length; });
+  $$('#libTabs .seg-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.type === libType));
+  $('#libAdd span').textContent = `Add ${def.single}`;
+  $('#libListTitle').textContent = def.label;
+  $('#libViewSite').href = `index.html#${libType}`;
+
+  const q = libQuery.toLowerCase();
+  const items = getLib(libType)
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+    .filter((item) => !q || Object.values(item.title || {}).some((v) => String(v).toLowerCase().includes(q)));
+
+  $('#libList').innerHTML = items.length ? items.map((item) => {
+    const thumb = item.image || youtubeThumb(item.url);
+    const ext = def.file ? ((String(item.url || '').match(/\.(\w+)$/) || [])[1] || 'file').toUpperCase().slice(0, 4) : '';
+    const title = firstText(item.title) || '(untitled)';
+    return `
+      <div class="lib-row" data-id="${escapeHtml(item.id)}">
+        <div class="lib-thumb">${thumb ? `<img src="${escapeHtml(thumb)}" alt="" loading="lazy" />` : `<span>${escapeHtml(ext || def.label[0])}</span>`}</div>
+        <div class="lib-main">
+          <strong dir="auto">${escapeHtml(title)}</strong>
+          <div class="lib-meta-row">
+            <span>${escapeHtml(item.date || '–')}</span>
+            ${def.categories ? `<span class="lib-cat">${escapeHtml(def.categories[item.category] || Object.values(def.categories)[0])}</span>` : ''}
+            <span class="lib-langs">${LIB_LANGS.map(([code]) => `<i class="${item.title?.[code] ? 'on' : ''}" title="${item.title?.[code] ? 'Written' : 'Missing'} in ${code.toUpperCase()}">${code.toUpperCase()}</i>`).join('')}</span>
+          </div>
+        </div>
+        <div class="lib-actions-row">
+          <button class="btn btn-soft sm" type="button" data-lib-edit="${escapeHtml(item.id)}">Edit</button>
+          <button class="mini-btn danger" type="button" data-lib-delete="${escapeHtml(item.id)}" title="Delete" aria-label="Delete"><svg class="ico"><use href="#i-trash"/></svg></button>
+        </div>
+      </div>`;
+  }).join('') : emptyState('i-sparkle', q ? 'Nothing matches' : `No ${def.label.toLowerCase()} yet`, q ? 'Try another search.' : `Click “Add ${def.single}” to publish the first one.`);
+}
+
+function openLibEditor(item) {
+  const def = LIB_TYPES[libType];
+  libDraft = item ? clone(item) : { id: `${libType}-${Date.now().toString(36)}`, date: todayIso(), title: {}, text: {}, ...(def.categories ? { category: Object.keys(def.categories)[0] } : {}) };
+  libDraft.title = libDraft.title || {};
+  libDraft.text = libDraft.text || {};
+  const isNew = !item;
+  const textLabel = libType === 'videos' ? 'Description' : 'Text';
+
+  $('#libEditor').innerHTML = `
+    <div class="panel-head">
+      <div>
+        <h3>${isNew ? `New ${def.single}` : `Edit ${def.single}`}</h3>
+        <p>Fill in at least one language. Blank lines in the text start a new paragraph.</p>
+      </div>
+      <button class="mini-btn" type="button" data-lib-cancel title="Close" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <label class="input-label">Date<input type="date" data-lib-field="date" value="${escapeHtml(libDraft.date || '')}" /></label>
+      ${def.categories ? `<label class="input-label">Type<select data-lib-field="category">${Object.entries(def.categories).map(([v, l]) => `<option value="${v}" ${libDraft.category === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
+      ${def.author ? `<label class="input-label">Author <small>(optional)</small><input data-lib-field="author" value="${escapeHtml(libDraft.author || '')}" placeholder="Neuer Blick Verein e.V." /></label>` : ''}
+      <div class="input-label full">${def.video ? 'Video <small>upload an MP4/WebM file, or paste a YouTube or Vimeo link</small>' : 'Video <small>(optional) upload an MP4/WebM file, or paste a YouTube or Vimeo link</small>'}
+        <div class="lib-file">
+          <input data-lib-field="${def.video ? 'url' : 'video'}" dir="ltr" value="${escapeHtml((def.video ? libDraft.url : libDraft.video) || '')}" placeholder="https://www.youtube.com/watch?v=… or media/…" />
+          <label class="btn btn-soft"><svg class="ico"><use href="#i-upload"/></svg> Upload video<input type="file" id="libVideoInput" accept="video/mp4,video/webm,.m4v" hidden /></label>
+        </div>
+        <div class="lib-progress" id="libVideoProgress" hidden><span></span><b></b></div>
+      </div>
+      ${def.file ? `
+      <div class="input-label full">File <small>(optional) PDF, Word, Excel or PowerPoint, up to 300 MB</small>
+        <div class="lib-file">
+          <input data-lib-field="url" dir="ltr" value="${escapeHtml(libDraft.url || '')}" placeholder="docs/… or https://…" />
+          <label class="btn btn-soft"><svg class="ico"><use href="#i-upload"/></svg> Upload file<input type="file" id="libFileInput" accept=".pdf,.doc,.docx,.xlsx,.pptx" hidden /></label>
+        </div>
+        <div class="lib-progress" id="libFileProgress" hidden><span></span><b></b></div>
+      </div>` : ''}
+      <div class="input-label full">More pictures <small>(optional) shown as a gallery inside the item</small>
+        <div class="lib-gallery" id="libGallery"></div>
+        <div class="lib-image-actions">
+          <label class="btn btn-soft sm"><svg class="ico"><use href="#i-upload"/></svg> Upload pictures<input type="file" id="libGalleryInput" accept="image/png,image/jpeg,image/webp,image/avif" multiple hidden /></label>
+          <button class="btn btn-soft sm" type="button" id="libGalleryPick"><svg class="ico"><use href="#i-grid"/></svg> From folder</button>
+        </div>
+      </div>
+      ${def.image ? `
+      <div class="input-label full">Cover picture ${def.video ? '<small>(optional, YouTube videos get their own picture)</small>' : '<small>(optional)</small>'}
+        <div class="lib-image">
+          <div class="lib-image-preview" id="libImagePreview"></div>
+          <div class="lib-image-actions">
+            <label class="btn btn-soft sm"><svg class="ico"><use href="#i-upload"/></svg> Upload<input type="file" id="libImageInput" accept="image/png,image/jpeg,image/webp,image/avif" hidden /></label>
+            <button class="btn btn-soft sm" type="button" id="libImagePick"><svg class="ico"><use href="#i-grid"/></svg> Folder</button>
+            <button class="btn btn-soft sm" type="button" id="libImageClear"><svg class="ico"><use href="#i-x"/></svg> Remove</button>
+          </div>
+        </div>
+      </div>` : ''}
+    </div>
+
+    <div class="lib-lang-tabs" role="tablist">
+      ${LIB_LANGS.map(([code, name], i) => `<button type="button" class="lib-lang ${i === 0 ? 'active' : ''}" data-lang-tab="${code}" role="tab"><i></i>${name}</button>`).join('')}
+    </div>
+    ${LIB_LANGS.map(([code, , dir], i) => `
+      <div class="lib-lang-panel" data-lang-panel="${code}" ${i === 0 ? '' : 'hidden'}>
+        <label class="input-label">Title<input data-lib-lang="title" data-code="${code}" dir="${dir}" value="${escapeHtml(libDraft.title[code] || '')}" /></label>
+        <label class="input-label">${textLabel}<textarea data-lib-lang="text" data-code="${code}" dir="${dir}" rows="${libType === 'videos' ? 4 : 9}">${escapeHtml(libDraft.text[code] || '')}</textarea></label>
+      </div>`).join('')}
+
+    <div class="lib-editor-foot">
+      ${isNew ? '' : '<button class="btn btn-danger" type="button" data-lib-delete-draft><svg class="ico"><use href="#i-trash"/></svg> Delete</button>'}
+      <span class="lib-spacer"></span>
+      <button class="btn btn-soft" type="button" data-lib-cancel>Cancel</button>
+      <button class="btn btn-primary" type="button" id="libSave"><svg class="ico"><use href="#i-save"/></svg> ${isNew ? 'Publish' : 'Save changes'}</button>
+    </div>`;
+  $('#libEditor').hidden = false;
+  paintLibImage();
+  paintLibGallery();
+  markLangTabs();
+  $('#libEditor').scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+}
+
+function paintLibImage() {
+  const box = $('#libImagePreview');
+  if (!box) return;
+  const src = libDraft.image || youtubeThumb(libDraft.url);
+  box.innerHTML = src ? `<img src="${escapeHtml(src)}" alt="" />` : '<span>No picture</span>';
+  $('#libImageClear').hidden = !libDraft.image;
+}
+
+function paintLibGallery() {
+  const box = $('#libGallery');
+  if (!box) return;
+  const images = Array.isArray(libDraft.images) ? libDraft.images : [];
+  box.innerHTML = images.length
+    ? images.map((src, i) => `
+        <div class="lib-gallery-item">
+          <img src="${escapeHtml(src)}" alt="" loading="lazy" />
+          <button type="button" class="mini-btn" data-gallery-remove="${i}" title="Remove picture" aria-label="Remove picture"><svg class="ico"><use href="#i-x"/></svg></button>
+        </div>`).join('')
+    : '<span class="lib-gallery-empty">No extra pictures yet</span>';
+}
+
+function addLibImages(paths) {
+  libDraft.images = [...(Array.isArray(libDraft.images) ? libDraft.images : []), ...paths];
+  paintLibGallery();
+}
+
+function markLangTabs() {
+  $$('#libEditor [data-lang-tab]').forEach((tab) => tab.classList.toggle('filled', Boolean(libDraft.title[tab.dataset.langTab]?.trim())));
+}
+
+// Streams a large file to the server with a progress bar (videos up to 300 MB)
+function uploadLargeFile(file, progressEl) {
+  return new Promise((resolve, reject) => {
+    if (window.NB_DEMO) {
+      reject(new Error('Video and document uploads need the real server. In the demo, paste a YouTube link instead.'));
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/api/upload-file?name=${encodeURIComponent(file.name)}`);
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    if (progressEl) {
+      progressEl.hidden = false;
+      progressEl.querySelector('span').style.width = '0%';
+      progressEl.querySelector('b').textContent = '0%';
+    }
+    xhr.upload.onprogress = (e) => {
+      if (!progressEl || !e.lengthComputable) return;
+      const pct = Math.round((e.loaded / e.total) * 100);
+      progressEl.querySelector('span').style.width = `${pct}%`;
+      progressEl.querySelector('b').textContent = `${pct}%`;
+    };
+    xhr.onload = () => {
+      if (progressEl) progressEl.hidden = true;
+      let data = null;
+      try { data = JSON.parse(xhr.responseText); } catch (e) { /* not JSON */ }
+      if (xhr.status === 401) sessionExpired();
+      if (xhr.status >= 200 && xhr.status < 300 && data?.path) resolve(data.path);
+      else reject(new Error(data?.error || `Upload failed (${xhr.status})`));
+    };
+    xhr.onerror = () => {
+      if (progressEl) progressEl.hidden = true;
+      reject(new Error(SERVER_HINT));
+    };
+    xhr.send(file);
+  });
+}
+
+async function saveLibList(list, button) {
+  const ok = await saveContent(libType, list, button);
+  if (ok) paintLibList();
+  return ok;
+}
+
+async function saveLibDraft() {
+  const def = LIB_TYPES[libType];
+  LIB_LANGS.forEach(([code]) => {
+    if (!libDraft.title[code]?.trim()) delete libDraft.title[code];
+    if (!libDraft.text[code]?.trim()) delete libDraft.text[code];
+  });
+  if (!Object.keys(libDraft.title).length) {
+    toast('Please write a title in at least one language.', 'error');
+    $('#libEditor [data-lib-lang="title"]')?.focus();
+    return;
+  }
+  if (def.video && !isVideoLink(libDraft.url || '')) {
+    toast('Please upload a video, or paste a YouTube or Vimeo link.', 'error');
+    return;
+  }
+  if (!def.video && String(libDraft.video || '').trim() && !isVideoLink(libDraft.video)) {
+    toast('The video must be an uploaded file or a YouTube or Vimeo link.', 'error');
+    return;
+  }
+  if (def.file && String(libDraft.url || '').trim() && !/^(https?:\/\/|docs\/|images\/|media\/)/i.test(libDraft.url)) {
+    toast('The file link must start with https:// or be an uploaded file.', 'error');
+    return;
+  }
+  ['url', 'image', 'author', 'video'].forEach((key) => { if (!String(libDraft[key] || '').trim()) delete libDraft[key]; });
+  if (!libDraft.images?.length) delete libDraft.images;
+
+  const list = getLib(libType);
+  const index = list.findIndex((item) => item.id === libDraft.id);
+  const isNew = index === -1;
+  if (isNew) list.push(libDraft);
+  else list[index] = libDraft;
+  if (await saveLibList(list, $('#libSave'))) {
+    toast(isNew ? `Published. The ${def.single} is now on the website.` : 'Changes saved.');
+    renderLibraryView();
+  }
+}
+
+async function deleteLibItem(id) {
+  const def = LIB_TYPES[libType];
+  const item = getLib(libType).find((entry) => entry.id === id);
+  if (!item) return;
+  const ok = await confirmAction(`Delete this ${def.single}?`, `“${firstText(item.title) || 'Untitled'}” will be removed from the website.`, 'Delete');
+  if (!ok) return;
+  if (await saveLibList(getLib(libType).filter((entry) => entry.id !== id))) {
+    toast(`${def.single[0].toUpperCase()}${def.single.slice(1)} deleted.`);
+    renderLibraryView();
+  }
+}
+
+$('#libTabs')?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-type]');
+  if (!btn || btn.dataset.type === libType) return;
+  if (libDraft && !(await confirmAction('Discard this draft?', 'The item you are editing has not been saved.', 'Discard'))) return;
+  libType = btn.dataset.type;
+  renderLibraryView();
+});
+
+$('#libSearch')?.addEventListener('input', (e) => {
+  libQuery = e.target.value.trim();
+  paintLibList();
+});
+
+$('#libAdd')?.addEventListener('click', () => openLibEditor(null));
+
+$('#libList')?.addEventListener('click', (e) => {
+  const edit = e.target.closest('[data-lib-edit]');
+  const del = e.target.closest('[data-lib-delete]');
+  if (edit) openLibEditor(getLib(libType).find((item) => item.id === edit.dataset.libEdit));
+  if (del) deleteLibItem(del.dataset.libDelete);
+});
+
+$('#libEditor')?.addEventListener('input', (e) => {
+  if (!libDraft) return;
+  const field = e.target.closest('[data-lib-field]');
+  const lang = e.target.closest('[data-lib-lang]');
+  if (field) {
+    libDraft[field.dataset.libField] = field.value;
+    if (field.dataset.libField === 'url') paintLibImage();
+  }
+  if (lang) {
+    libDraft[lang.dataset.libLang][lang.dataset.code] = lang.value;
+    markLangTabs();
+  }
+});
+
+$('#libEditor')?.addEventListener('change', async (e) => {
+  if (!libDraft) return;
+  if (e.target.id === 'libImageInput' && e.target.files[0]) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    try {
+      libDraft.image = await uploadImage(file, 1600);
+      paintLibImage();
+      toast('Picture uploaded.');
+    } catch (err) {
+      toast(err.message || 'That picture could not be uploaded.', 'error');
+    }
+  }
+  if (e.target.id === 'libGalleryInput' && e.target.files.length) {
+    const files = [...e.target.files];
+    e.target.value = '';
+    const uploaded = [];
+    for (const file of files) {
+      try {
+        uploaded.push(await uploadImage(file, 1800));
+      } catch (err) {
+        toast(`${file.name}: ${err.message}`, 'error');
+      }
+    }
+    if (uploaded.length) {
+      addLibImages(uploaded);
+      toast(`${uploaded.length} picture${uploaded.length === 1 ? '' : 's'} added.`);
+    }
+  }
+  if (e.target.id === 'libVideoInput' && e.target.files[0]) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    const field = LIB_TYPES[libType].video ? 'url' : 'video';
+    try {
+      const path = await uploadLargeFile(file, $('#libVideoProgress'));
+      libDraft[field] = path;
+      $(`#libEditor [data-lib-field="${field}"]`).value = path;
+      toast('Video uploaded.');
+    } catch (err) {
+      toast(err.message || 'That video could not be uploaded.', 'error');
+    }
+  }
+  if (e.target.id === 'libFileInput' && e.target.files[0]) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    try {
+      const path = await uploadLargeFile(file, $('#libFileProgress'));
+      libDraft.url = path;
+      $('#libEditor [data-lib-field="url"]').value = path;
+      if (!Object.keys(libDraft.title).length) {
+        const name = file.name.replace(/\.\w+$/, '').replace(/[_-]+/g, ' ');
+        libDraft.title.de = name;
+        $('#libEditor [data-lib-lang="title"][data-code="de"]').value = name;
+        markLangTabs();
+      }
+      toast('File uploaded.');
+    } catch (err) {
+      toast(err.message || 'That file could not be uploaded.', 'error');
+    }
+  }
+});
+
+$('#libEditor')?.addEventListener('click', async (e) => {
+  if (!libDraft) return;
+  const tab = e.target.closest('[data-lang-tab]');
+  if (tab) {
+    $$('#libEditor [data-lang-tab]').forEach((t) => t.classList.toggle('active', t === tab));
+    $$('#libEditor [data-lang-panel]').forEach((p) => { p.hidden = p.dataset.langPanel !== tab.dataset.langTab; });
+    $(`#libEditor [data-lang-panel="${tab.dataset.langTab}"] input`)?.focus();
+    return;
+  }
+  if (e.target.closest('#libImagePick')) {
+    const path = await pickFromLibrary();
+    if (path) {
+      libDraft.image = path;
+      paintLibImage();
+    }
+    return;
+  }
+  if (e.target.closest('#libImageClear')) {
+    delete libDraft.image;
+    paintLibImage();
+    return;
+  }
+  if (e.target.closest('#libGalleryPick')) {
+    const path = await pickFromLibrary();
+    if (path) addLibImages([path]);
+    return;
+  }
+  const removePic = e.target.closest('[data-gallery-remove]');
+  if (removePic) {
+    libDraft.images.splice(Number(removePic.dataset.galleryRemove), 1);
+    paintLibGallery();
+    return;
+  }
+  if (e.target.closest('[data-lib-cancel]')) {
+    renderLibraryView();
+    return;
+  }
+  if (e.target.closest('[data-lib-delete-draft]')) {
+    deleteLibItem(libDraft.id);
+    return;
+  }
+  if (e.target.closest('#libSave')) saveLibDraft();
+});
+
+// ==========================================================================
 // VIEW: Settings (stats, email, backup)
 // ==========================================================================
 async function renderSettings() {
@@ -2004,7 +2994,7 @@ $('#resetAll')?.addEventListener('click', async () => {
   const ok = await confirmAction('Reset all website content?', 'Texts, announcements, event, contact, images, gallery and statistics go back to their defaults. The inbox, accounts and image files are kept.', 'Reset content');
   if (!ok) return;
   try {
-    content = await api('content', { method: 'PUT', body: Object.fromEntries(['overrides', 'messages', 'contact', 'social', 'images', 'gallery', 'event', 'stats'].map((k) => [k, null])) });
+    content = await api('content', { method: 'PUT', body: Object.fromEntries(['overrides', 'messages', 'contact', 'social', 'images', 'gallery', 'event', 'stats', 'news', 'articles', 'videos', 'documents'].map((k) => [k, null])) });
     channel?.postMessage({ type: 'content-updated' });
     dirtyViews.clear();
     $$('.nav-item').forEach((n) => n.classList.remove('dirty'));

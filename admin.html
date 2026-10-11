@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Neuer Blick | Content Studio</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="scrollbars.css" />
 </head>
 <body>
   <!-- Icon Sprite -->
@@ -185,6 +187,7 @@
         <p class="side-label">Workspace</p>
         <button class="nav-item active" data-view="overview"><svg class="ico"><use href="#i-home"/></svg><span>Overview</span></button>
         <button class="nav-item" data-view="inbox"><svg class="ico"><use href="#i-inbox"/></svg><span>Inbox</span><b class="nav-badge" id="inboxBadge" hidden>0</b></button>
+        <button class="nav-item" data-view="members"><svg class="ico"><use href="#i-chart"/></svg><span>Members &amp; finance</span><b class="nav-badge" id="membersBadge" hidden>0</b></button>
         <p class="side-label">Website content</p>
         <button class="nav-item" data-view="translations"><svg class="ico"><use href="#i-globe"/></svg><span>Texts &amp; translations</span><i class="dirty-dot"></i></button>
         <button class="nav-item" data-view="announcements"><svg class="ico"><use href="#i-megaphone"/></svg><span>Announcements</span><i class="dirty-dot"></i></button>
@@ -192,6 +195,7 @@
         <button class="nav-item" data-view="contact"><svg class="ico"><use href="#i-phone"/></svg><span>Contact &amp; social</span><i class="dirty-dot"></i></button>
         <button class="nav-item" data-view="media"><svg class="ico"><use href="#i-image"/></svg><span>Website images</span><i class="dirty-dot"></i></button>
         <button class="nav-item" data-view="gallery"><svg class="ico"><use href="#i-grid"/></svg><span>Photo gallery</span><i class="dirty-dot"></i></button>
+        <button class="nav-item" data-view="library"><svg class="ico"><use href="#i-sparkle"/></svg><span>News &amp; media</span><i class="dirty-dot"></i></button>
         <p class="side-label">System</p>
         <button class="nav-item" data-view="users"><svg class="ico"><use href="#i-users"/></svg><span>Users</span></button>
         <button class="nav-item" data-view="settings"><svg class="ico"><use href="#i-settings"/></svg><span>Settings &amp; backup</span><i class="dirty-dot"></i></button>
@@ -327,6 +331,97 @@
             </div>
           </div>
           <div id="inboxList" class="inbox-list"></div>
+        </section>
+
+        <!-- MEMBERS & FINANCE -->
+        <section class="view" data-view="members">
+          <div class="kpi-grid kpi-five">
+            <button class="kpi" type="button" data-member-filter="active" style="--accent: var(--emerald)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-users"/></svg></span>
+              <span class="kpi-label">Active members</span>
+              <b class="kpi-value" id="mkActive">0</b>
+              <span class="kpi-sub" id="mkActiveSub">–</span>
+            </button>
+            <button class="kpi" type="button" data-member-filter="pending" style="--accent: var(--saffron)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-inbox"/></svg></span>
+              <span class="kpi-label">Pending approval</span>
+              <b class="kpi-value" id="mkPending">0</b>
+              <span class="kpi-sub">waiting for you</span>
+            </button>
+            <button class="kpi" type="button" style="--accent: var(--lapis-light)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-chart"/></svg></span>
+              <span class="kpi-label" id="mkCollectedLabel">Collected this year</span>
+              <b class="kpi-value" id="mkCollected">0 €</b>
+              <span class="kpi-sub" id="mkCollectedSub">–</span>
+            </button>
+            <button class="kpi" type="button" data-member-filter="unpaid" style="--accent: var(--saffron)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-calendar"/></svg></span>
+              <span class="kpi-label">Outstanding fees</span>
+              <b class="kpi-value" id="mkOutstanding">0 €</b>
+              <span class="kpi-sub" id="mkOutstandingSub">–</span>
+            </button>
+            <button class="kpi" type="button" data-member-filter="overdue" style="--accent: var(--pomegranate)">
+              <span class="kpi-icon"><svg class="ico"><use href="#i-x"/></svg></span>
+              <span class="kpi-label">Overdue</span>
+              <b class="kpi-value" id="mkOverdue">0</b>
+              <span class="kpi-sub">more than 30 days late</span>
+            </button>
+          </div>
+
+          <div class="fin-grid">
+            <div class="panel fin-chart-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Fees collected per month</h3>
+                  <p>Last 12 months, all recorded payments. Hover a bar for details.</p>
+                </div>
+              </div>
+              <div class="fin-chart" id="finChart"></div>
+              <table class="sr-only" id="finTable"></table>
+            </div>
+            <div class="fin-side">
+              <div class="panel">
+                <div class="panel-head"><div><h3>Payment status</h3><p id="statusSub">Active members</p></div></div>
+                <div class="status-bar" id="statusBar"></div>
+                <ul class="fin-legend" id="statusLegend"></ul>
+              </div>
+              <div class="panel">
+                <div class="panel-head"><div><h3>Membership types</h3><p>Active and pending members</p></div></div>
+                <div class="hbars" id="memberTypeBars"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel pending-panel" id="pendingPanel" hidden>
+            <div class="panel-head">
+              <div>
+                <h3>New applications <span class="hero-count" id="pendingCount">0</span></h3>
+                <p>People who filled in the membership form. They can sign in once you approve them.</p>
+              </div>
+            </div>
+            <div class="pending-list" id="pendingList"></div>
+          </div>
+
+          <div class="panel">
+            <div class="toolbar members-toolbar">
+              <div class="chip-row" id="memberFilters"></div>
+              <div class="toolbar-right">
+                <label class="search-box">
+                  <svg class="ico"><use href="#i-search"/></svg>
+                  <input id="memberSearch" type="search" placeholder="Search name, email, number…" />
+                </label>
+                <button class="btn btn-soft" id="exportMembers" type="button"><svg class="ico"><use href="#i-download"/></svg> Export CSV</button>
+              </div>
+            </div>
+            <div class="mem-table-wrap">
+              <table class="mem-table">
+                <thead>
+                  <tr><th>Member</th><th>No.</th><th>Type</th><th class="num">Fee / year</th><th class="num">Paid this year</th><th class="num">Balance</th><th>Next due</th><th>Status</th></tr>
+                </thead>
+                <tbody id="memberRows"></tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <!-- TRANSLATIONS -->
@@ -523,6 +618,37 @@
         </section>
 
         <!-- GALLERY -->
+        <section class="view" data-view="library">
+          <div class="toolbar">
+            <div class="seg" id="libTabs" role="tablist">
+              <button class="seg-btn active" type="button" data-type="news" role="tab">News <b class="lib-count" data-count="news">0</b></button>
+              <button class="seg-btn" type="button" data-type="articles" role="tab">Articles <b class="lib-count" data-count="articles">0</b></button>
+              <button class="seg-btn" type="button" data-type="videos" role="tab">Videos <b class="lib-count" data-count="videos">0</b></button>
+              <button class="seg-btn" type="button" data-type="documents" role="tab">Documents <b class="lib-count" data-count="documents">0</b></button>
+            </div>
+            <div class="toolbar-right">
+              <label class="search-box">
+                <svg class="ico"><use href="#i-search"/></svg>
+                <input id="libSearch" type="search" placeholder="Search titles…" />
+              </label>
+              <a class="btn btn-soft" id="libViewSite" href="index.html#news" target="_blank" rel="noopener"><svg class="ico"><use href="#i-external"/></svg> View on website</a>
+              <button class="btn btn-primary" id="libAdd" type="button"><svg class="ico"><use href="#i-plus"/></svg> <span>Add news</span></button>
+            </div>
+          </div>
+
+          <div class="panel lib-editor" id="libEditor" hidden></div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3 id="libListTitle">News</h3>
+                <p id="libListHint">Shown newest first on the website. Each item can be written in any of the four languages; visitors see their language, or another one if it is missing.</p>
+              </div>
+            </div>
+            <div class="lib-rows" id="libList"></div>
+          </div>
+        </section>
+
         <section class="view" data-view="gallery">
           <div class="panel">
             <div class="panel-head">
@@ -703,6 +829,30 @@
   </div>
 
   <!-- Confirm Dialog -->
+  <!-- Member detail drawer -->
+  <div class="drawer" id="memberDrawer" hidden>
+    <div class="drawer-backdrop" data-drawer-close></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" id="drawerBody"></aside>
+  </div>
+
+  <!-- Approve / reject / deactivate / reactivate a member -->
+  <div class="confirm" id="memberActionDialog" hidden>
+    <div class="palette-backdrop" data-action-cancel></div>
+    <form class="confirm-box member-action-box" id="memberActionForm" role="alertdialog" aria-modal="true" aria-labelledby="maTitle" novalidate>
+      <span class="confirm-icon" id="maIcon">!</span>
+      <h3 id="maTitle"></h3>
+      <p id="maText"></p>
+      <label class="input-label" id="maReasonWrap">Internal reason <small>(only admins see this)</small><input id="maReason" maxlength="500" /></label>
+      <label class="notify-line"><input type="checkbox" id="maNotify" /> <span>Send an email to the member</span></label>
+      <label class="input-label" id="maMessageWrap">Personal message in the email <small>(optional)</small><textarea id="maMessage" rows="4" maxlength="2000"></textarea></label>
+      <p class="hint" id="maMailHint"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-soft" type="button" data-action-cancel>Cancel</button>
+        <button class="btn btn-primary" type="submit" id="maConfirm">Confirm</button>
+      </div>
+    </form>
+  </div>
+
   <div class="confirm" id="confirmDialog" hidden>
     <div class="palette-backdrop" data-confirm="no"></div>
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
@@ -749,6 +899,7 @@
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
+  <script src="demo-api.js"></script>
   <script src="site-data.js"></script>
   <script src="admin.js"></script>
 </body>
